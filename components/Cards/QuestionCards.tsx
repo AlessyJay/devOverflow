@@ -25,8 +25,8 @@ const QuestionCards = ({
   views: number;
   upvote: number;
   tags: {
-    id: string;
-    title: string;
+    _id: string;
+    name: string;
   }[];
   answers: Array<object>;
 }) => {
@@ -47,7 +47,7 @@ const QuestionCards = ({
 
       <div className="mt-3.5 flex flex-wrap gap-2 text-black">
         {tags.map((tag) => (
-          <RenderTag key={tag.id} id={tag.id} title={tag.title} />
+          <RenderTag key={tag._id} id={tag._id} title={tag.name} />
         ))}
       </div>
 

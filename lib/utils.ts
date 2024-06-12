@@ -53,6 +53,10 @@ export const getTimeStamp = (createdAt: Date): string => {
 };
 
 export const formatNumber = (num: number): string => {
+  if (num === undefined || num === null) {
+    return "0"; // or handle it in a way that fits your application's needs.
+  }
+
   if (num >= 1000000) {
     const formatToNum = (num / 1000000).toFixed(1);
     return `${formatToNum}M`;

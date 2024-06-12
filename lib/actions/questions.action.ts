@@ -3,9 +3,27 @@
 import Question from "@/database/question.model";
 import { connectToDB } from "../mongoose";
 import Tag from "@/database/tag.model";
+import { CreateQuestionParams, GetQuestionsParams } from "./shared.types";
+import console from "console";
+import User from "@/database/user.model";
+import { revalidatePath } from "next/cache";
 
-export const CreateQuestion = async (params: any) => {
-  // eslint-disable-next-line no-empty
+export const getQuestions = async (params: GetQuestionsParams) => {
+  try {
+    connectToDB();
+
+    const questions = await Question.find({})
+      .populate({ path: "tags", model: Tag })
+      .populate({ path: "author", model: User })
+      .sort({ createdAt: -1 });
+
+    return { questions };
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const CreateQuestion = async (params: CreateQuestionParams) => {
   try {
     connectToDB();
 
@@ -25,18 +43,19 @@ export const CreateQuestion = async (params: any) => {
     for (const tag of tags) {
       const existingTag = await Tag.findOneAndUpdate(
         { name: { $regex: new RegExp(`^${tag}$`, "i") } },
-        { $setOnInsert: { name: tag }, $push: { question: question.id } },
+        { $setOnInsert: { name: tag }, $push: { question: question._id } },
         { upsert: true, new: true },
       );
 
-      tagsDocument.push(existingTag.id);
+      tagsDocument.push(existingTag._id);
     }
 
-    await Question.findOneAndUpdate(question.id, {
+    await Question.findOneAndUpdate(question._id, {
       $push: { tags: { $each: tagsDocument } },
     });
 
     // Create an interaction record for the user's ask_question
+    revalidatePath(path);
   } catch (error) {
     console.log(error);
   }

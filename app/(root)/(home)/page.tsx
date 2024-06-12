@@ -1,10 +1,13 @@
-import Cards from "@/components/shared/questions/Cards";
+import QuestionCards from "@/components/Cards/QuestionCards";
+import NoResult from "@/components/shared/NoResult";
 import Filter from "@/components/shared/search/Filter";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
 import { Button } from "@/components/ui/button";
+import { getQuestions } from "@/lib/actions/questions.action";
 import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
+  const result = await getQuestions({});
   return (
     <>
       <div className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
@@ -29,7 +32,32 @@ export default function Home() {
       <Filter />
 
       <section className="my-10 flex w-full flex-col gap-6">
-        <Cards />
+        <div>
+          {result && result.questions.length > 0 ? (
+            result?.questions.map((item) => (
+              <QuestionCards
+                key={item.id}
+                id={item.id}
+                title={item.title}
+                tags={item.tags}
+                author={item.author}
+                upvote={item.upvote}
+                views={item.views}
+                createdAt={item.createdAt}
+                answers={item.answers}
+              />
+            ))
+          ) : (
+            <NoResult
+              title="There are no questions to show"
+              description="Be the first to break the silence! Ask a question and kickstart the
+        discussion. Our query could be next big thing others learn from. Get
+        involved!"
+              link="/ask-question"
+              linkTitle="Ask a Question"
+            />
+          )}
+        </div>
       </section>
     </>
   );
