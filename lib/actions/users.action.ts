@@ -5,10 +5,28 @@ import { connectToDB } from "../mongoose";
 import {
   CreateUserParams,
   DeleteUserParams,
+  GetAllTagsParams,
   UpdateUserParams,
 } from "./shared.types";
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
+
+export const getAllUsers = async (params: GetAllTagsParams) => {
+  try {
+    connectToDB();
+
+    // const { page = 1, pageSize = 20, filter, searchQuery } = params;
+
+    const allUser = await User.find({}).sort({ createdAt: -1 });
+
+    console.log(allUser);
+
+    return allUser;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 
 export const getUserById = async ({ userId }: { userId: string }) => {
   try {

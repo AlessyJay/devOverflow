@@ -4,7 +4,6 @@ import Question from "@/database/question.model";
 import { connectToDB } from "../mongoose";
 import Tag from "@/database/tag.model";
 import { CreateQuestionParams, GetQuestionsParams } from "./shared.types";
-import console from "console";
 import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
 
