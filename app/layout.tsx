@@ -4,6 +4,7 @@ import React from "react";
 // eslint-disable-next-line camelcase
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import "@/styles/prism.css";
 import ThemeProvider from "@/context/ThemeProvider";
 
 const inter = Inter({
