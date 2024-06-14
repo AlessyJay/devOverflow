@@ -3,8 +3,11 @@
 import Question from "@/database/question.model";
 import { connectToDB } from "../mongoose";
 import Tag from "@/database/tag.model";
-import { CreateQuestionParams, GetQuestionsParams } from "./shared.types";
-import console from "console";
+import {
+  CreateQuestionParams,
+  GetQuestionByIdParams,
+  GetQuestionsParams,
+} from "./shared.types";
 import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
 
@@ -20,6 +23,21 @@ export const getQuestions = async (params: GetQuestionsParams) => {
     return { questions };
   } catch (err) {
     console.log(err);
+  }
+};
+
+export const getQuestionById = async (params: GetQuestionByIdParams) => {
+  try {
+    connectToDB();
+
+    const { questionId } = params;
+
+    const question = await Question.findById({ questionId });
+
+    return question;
+  } catch (error) {
+    console.log(error);
+    return [];
   }
 };
 

@@ -1,4 +1,6 @@
+import { HomePageFilters } from "@/Constant/filters";
 import QuestionCards from "@/components/Cards/QuestionCards";
+import HomeFilters from "@/components/Home/HomeFilter";
 import NoResult from "@/components/shared/NoResult";
 import Filter from "@/components/shared/search/Filter";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
@@ -25,11 +27,18 @@ export default async function Home() {
           route="/"
           iconPosition="left"
           imgSrc="/assets/icons/search.svg"
-          placeholder="search for questions"
+          placeholder="Search for Questions"
           otherClasses="flex-1"
         />
+
+        <Filter
+          filters={HomePageFilters}
+          otherClasses="min-h-[56px] sm:min-w-[170px]"
+          containerClasses="hidden max-md:flex"
+        />
       </div>
-      <Filter />
+
+      <HomeFilters />
 
       <section className="my-10 flex w-full flex-col gap-6">
         <div>
