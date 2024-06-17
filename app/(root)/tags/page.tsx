@@ -8,7 +8,6 @@ import { getTimeStamp } from "@/lib/utils";
 
 const page = async () => {
   const { tags: allTags } = await getAllTags({});
-  console.log("From tags page! ", allTags);
   return (
     <div>
       <LocalSearchAndFilter

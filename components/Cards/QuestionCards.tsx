@@ -10,7 +10,7 @@ const QuestionCards = ({
   author,
   createdAt,
   views,
-  upvote,
+  upvote = [],
   tags,
   answers,
 }: {
@@ -23,13 +23,14 @@ const QuestionCards = ({
   };
   createdAt: Date;
   views: number;
-  upvote: number;
+  upvote: string[];
   tags: {
     _id: string;
     name: string;
   }[];
   answers: Array<object>;
 }) => {
+  console.log("This is the upvote: ", upvote);
   return (
     <div className="card-wrapper mb-10 rounded-[10px] p-9 sm:px-11">
       <div className="flex flex-col items-start gap-5 sm:flex-row">
@@ -64,7 +65,7 @@ const QuestionCards = ({
         <Metric
           imgUrl="/assets/icons/upvote.svg"
           alt="upvotes"
-          value={formatNumber(upvote)}
+          value={formatNumber(upvote.length)}
           title="Votes"
           textStyle="small-meduim text-dark400_light800"
         />
