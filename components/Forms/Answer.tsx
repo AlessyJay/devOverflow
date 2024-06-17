@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -15,9 +15,21 @@ import {
 import { AnswerSchema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Editor } from "@tinymce/tinymce-react";
+import { CreateAnswer } from "@/lib/actions/answers.action";
+import { usePathname } from "next/navigation";
+import { Button } from "../ui/button";
 
-const Answer = () => {
+interface Props {
+  question: string;
+  questionId: string;
+  authorId: string;
+}
+
+const Answer = ({ question, questionId, authorId }: Props) => {
+  const pathname = usePathname();
+
   const editorRef = useRef(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof AnswerSchema>>({
     resolver: zodResolver(AnswerSchema),
@@ -26,7 +38,30 @@ const Answer = () => {
     },
   });
 
-  const handleCreateAnswer = (values: z.infer<typeof AnswerSchema>) => {
+  const handleCreateAnswer = async (values: z.infer<typeof AnswerSchema>) => {
+    setIsSubmitting(true);
+
+    try {
+      await CreateAnswer({
+        content: values.content,
+        author: JSON.parse(authorId),
+        question: JSON.parse(questionId),
+        path: pathname,
+      });
+
+      form.reset();
+
+      if (editorRef.current) {
+        const editor = editorRef.current as any;
+
+        editor.setContent("");
+      }
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      setIsSubmitting(false);
+    }
     console.log(values);
   };
   return (
@@ -91,6 +126,16 @@ const Answer = () => {
             </FormItem>
           )}
         />
+
+        <div className="flex justify-end">
+          <Button
+            type="submit"
+            className="primary-gradient w-fit text-white"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
+        </div>
       </form>
     </Form>
   );
