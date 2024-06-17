@@ -6,10 +6,12 @@ import {
   CreateUserParams,
   DeleteUserParams,
   GetAllTagsParams,
+  ToggleSaveQuestionParams,
   UpdateUserParams,
 } from "./shared.types";
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
+import mongoose from "mongoose";
 
 export const getAllUsers = async (params: GetAllTagsParams) => {
   try {
@@ -97,4 +99,39 @@ export const deleteUser = async (userData: DeleteUserParams) => {
 
     return deletedUser;
   } catch (error) {}
+};
+
+export const saveQuestion = async (params: ToggleSaveQuestionParams) => {
+  try {
+    await connectToDB();
+
+    const { userId, questionId, path } = params;
+
+    if (!mongoose.Types.ObjectId.isValid(questionId)) {
+      throw new Error("Invalid question ID!");
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error("User not found!");
+    }
+
+    const question = await Question.findById(questionId);
+    if (!question) {
+      throw new Error("Question not found!");
+    }
+
+    if (!user.saved.includes(questionId)) {
+      user.saved.push(questionId);
+      await user.save();
+    } else {
+      user.saved.pull(questionId);
+      await user.save();
+    }
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 };

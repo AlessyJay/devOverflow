@@ -8,6 +8,7 @@ import { getQuestionById } from "@/lib/actions/questions.action";
 import { getUserById } from "@/lib/actions/users.action";
 import { formatNumber, getTimeStamp } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -34,11 +35,13 @@ const page = async ({
     downvotes,
   } = result;
 
-  console.log({ result });
-
   const { userId: clerkId } = auth();
 
   let mongoUser;
+
+  if (!clerkId) {
+    redirect("/sign-in");
+  }
 
   if (clerkId) {
     mongoUser = await getUserById({ userId: clerkId });
@@ -122,7 +125,7 @@ const page = async ({
 
       <AllAnswers
         questionId={_id}
-        userId={JSON.stringify(mongoUser.id)}
+        userId={mongoUser.id}
         totalAnswers={answers.length}
       />
 
