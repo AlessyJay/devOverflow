@@ -7,9 +7,11 @@ import {
   CreateQuestionParams,
   GetQuestionByIdParams,
   GetQuestionsParams,
+  QuestionVoteParams,
 } from "./shared.types";
 import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
+import mongoose from "mongoose";
 
 export const getQuestions = async (params: GetQuestionsParams) => {
   try {
@@ -86,5 +88,97 @@ export const CreateQuestion = async (params: CreateQuestionParams) => {
     revalidatePath(path);
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const upvoteQuestion = async (params: QuestionVoteParams) => {
+  try {
+    await connectToDB();
+
+    const { questionId, userId, hasupVoted, hasdownVoted, path } = params;
+
+    if (!mongoose.Types.ObjectId.isValid(questionId)) {
+      throw new Error("Invalid question ID!");
+    }
+
+    let updateQuery = {};
+    const pullOperations: any = {};
+    const pushOperations: any = {};
+
+    if (hasupVoted) {
+      pullOperations.upvotes = userId;
+    } else {
+      pushOperations.upvotes = userId;
+      if (hasdownVoted) {
+        pullOperations.downvotes = userId;
+      }
+    }
+
+    if (Object.keys(pullOperations).length > 0) {
+      updateQuery = { ...updateQuery, $pull: pullOperations };
+    }
+    if (Object.keys(pushOperations).length > 0) {
+      updateQuery = { ...updateQuery, $addToSet: pushOperations };
+    }
+
+    const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
+      new: true,
+    });
+
+    if (!question) {
+      throw new Error("Question not found");
+    }
+
+    // Increment author's reputation by =10 for upvotting
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const downvoteQuestion = async (params: QuestionVoteParams) => {
+  try {
+    await connectToDB();
+
+    const { questionId, userId, hasupVoted, hasdownVoted, path } = params;
+
+    if (!mongoose.Types.ObjectId.isValid(questionId)) {
+      throw new Error("Invalid question ID!");
+    }
+
+    let updateQuery = {};
+    const pullOperations: any = {};
+    const pushOperations: any = {};
+
+    if (hasdownVoted) {
+      pullOperations.downvotes = userId;
+    } else {
+      pushOperations.downvotes = userId;
+      if (hasupVoted) {
+        pullOperations.upvotes = userId;
+      }
+    }
+
+    if (Object.keys(pullOperations).length > 0) {
+      updateQuery = { ...updateQuery, $pull: pullOperations };
+    }
+    if (Object.keys(pushOperations).length > 0) {
+      updateQuery = { ...updateQuery, $addToSet: pushOperations };
+    }
+
+    const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
+      new: true,
+    });
+
+    if (!question) {
+      throw new Error("Question not found");
+    }
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 };

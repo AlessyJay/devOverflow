@@ -26,11 +26,17 @@ import "prismjs/components/prism-mongodb";
 import "prismjs/plugins/line-numbers/prism-line-numbers.js";
 import "prismjs/plugins/line-numbers/prism-line-numbers.css";
 
-const ParseHTML = ({ data }: { data: string }) => {
+const ParseHTML = ({
+  data,
+  className,
+}: {
+  data: string;
+  className?: string;
+}) => {
   useEffect(() => {
     Prism.highlightAll();
   }, []);
-  return <div className="rounded-md border p-5 shadow-sm">{parse(data)}</div>;
+  return <div className={className}>{parse(data)}</div>;
 };
 
 export default ParseHTML;

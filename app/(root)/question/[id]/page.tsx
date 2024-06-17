@@ -1,9 +1,13 @@
 import Answer from "@/components/Forms/Answer";
+import AllAnswers from "@/components/shared/AllAnswers";
 import Metric from "@/components/shared/Metric";
 import ParseHTML from "@/components/shared/ParseHTML";
 import RenderTag from "@/components/shared/RenderTag";
+import Votes from "@/components/shared/Votes";
 import { getQuestionById } from "@/lib/actions/questions.action";
+import { getUserById } from "@/lib/actions/users.action";
 import { formatNumber, getTimeStamp } from "@/lib/utils";
+import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -17,7 +21,29 @@ const page = async ({
 }) => {
   const result = await getQuestionById({ questionId: params.id });
   // eslint-disable-next-line no-unused-vars
-  const { title, content, tags, views, author, answers, createdAt } = result;
+  const {
+    _id,
+    title,
+    content,
+    tags,
+    views,
+    author,
+    answers,
+    createdAt,
+    upvotes,
+    downvotes,
+  } = result;
+
+  console.log({ result });
+
+  const { userId: clerkId } = auth();
+
+  let mongoUser;
+
+  if (clerkId) {
+    mongoUser = await getUserById({ userId: clerkId });
+  }
+
   return (
     <>
       <div className="flex-start w-full flex-col">
@@ -38,7 +64,18 @@ const page = async ({
             </p>
           </Link>
 
-          <div className="flex justify-end">For Voting</div>
+          <div className="flex justify-end">
+            <Votes
+              type="Question"
+              itemId={JSON.stringify(_id)}
+              userId={JSON.stringify(mongoUser.id)}
+              upvotes={upvotes.length}
+              hasUpvoted={upvotes.includes(mongoUser.id)}
+              downvotes={downvotes.length}
+              hasDownVoted={downvotes.includes(mongoUser.id)}
+              hasSaved={mongoUser?.saved.includes(_id)}
+            />
+          </div>
         </div>
 
         <h2 className="h2-semibold text-dark200_light900 mt-3.5 w-full">
@@ -70,7 +107,7 @@ const page = async ({
         />
       </div>
 
-      <ParseHTML data={content} />
+      <ParseHTML data={content} className="rounded-md border p-5 shadow-sm" />
 
       <div className="mt-8 flex flex-wrap gap-2">
         {tags.map((tag: any) => (
@@ -83,8 +120,17 @@ const page = async ({
         ))}
       </div>
 
-      {/* TODO: Answer form */}
-      <Answer />
+      <AllAnswers
+        questionId={_id}
+        userId={JSON.stringify(mongoUser.id)}
+        totalAnswers={answers.length}
+      />
+
+      <Answer
+        question={content}
+        questionId={JSON.stringify(_id)}
+        authorId={JSON.stringify(mongoUser.id)}
+      />
     </>
   );
 };
