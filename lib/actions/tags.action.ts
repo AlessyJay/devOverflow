@@ -7,7 +7,7 @@ import {
 } from "./shared.types";
 import { connectToDB } from "../mongoose";
 import User from "@/database/user.model";
-import Tag from "@/database/tag.model";
+import Tag, { ITag } from "@/database/tag.model";
 import { FilterQuery } from "mongoose";
 import Question from "@/database/question.model";
 
@@ -40,12 +40,12 @@ export const getAllTags = async (params: GetAllTagsParams) => {
   try {
     connectToDB();
 
-    const tags = await Tag.find({}).populate("question");
+    const tags = await Tag.find({}).populate("questions");
 
     return { tags };
   } catch (error) {
     console.log(error);
-    return { tags: [] };
+    throw error;
   }
 };
 
@@ -56,13 +56,14 @@ export const getSpecificTag = async (params: GetQuestionsByTagIdParams) => {
     // eslint-disable-next-line no-unused-vars
     const { tagId, page = 1, pageSize = 10, searchQuery } = params;
 
-    const query: FilterQuery<typeof Question> = searchQuery
-      ? { title: { $regex: new RegExp(searchQuery, "i") } }
-      : {};
+    const tagFilter: FilterQuery<ITag> = { _id: tagId };
 
-    const tag = await Tag.findOne({ tagId }).populate({
-      path: "question",
-      match: query,
+    const tag = await Tag.findOne(tagFilter).populate({
+      path: "questions",
+      model: Question,
+      match: searchQuery
+        ? { title: { $regex: searchQuery, $options: "i" } }
+        : {},
       options: {
         sort: { createdAt: -1 },
       },
@@ -76,9 +77,9 @@ export const getSpecificTag = async (params: GetQuestionsByTagIdParams) => {
       throw new Error("There is no such tag!");
     }
 
-    const getTheTag = tag.saved;
+    const questions = tag.questions;
 
-    return { tags: getTheTag };
+    return { tagTitle: tag.name, questions };
   } catch (error) {
     console.log(error);
     throw error;
