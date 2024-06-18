@@ -10,6 +10,7 @@ import { connectToDB } from "../mongoose";
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
 import mongoose from "mongoose";
+import User from "@/database/user.model";
 
 export const CreateAnswer = async (params: CreateAnswerParams) => {
   try {
@@ -138,6 +139,47 @@ export const downvoteAnswer = async (params: AnswerVoteParams) => {
     }
 
     revalidatePath(path);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getUserAnswer = async ({
+  userId,
+  page = 1,
+  pageSize = 10,
+}: {
+  userId: string;
+  page?: number;
+  pageSize?: number;
+}) => {
+  try {
+    connectToDB();
+
+    const user = await User.findOne({ userId });
+
+    if (!user) {
+      throw new Error("User not found!");
+    }
+
+    const authorId = new mongoose.Types.ObjectId(user._id);
+
+    const skip = (page - 1) * pageSize;
+
+    const answers = await Answer.find({ author: authorId })
+      .skip(skip)
+      .limit(pageSize)
+      .populate([
+        { path: "author", model: User, select: "_id clerkId name picture" },
+        {
+          path: "question",
+          model: Question,
+          select: "_id title content tags views upvotes downvotes",
+        },
+      ]);
+
+    return { answers };
   } catch (error) {
     console.log(error);
     throw error;

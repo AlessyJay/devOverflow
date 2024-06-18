@@ -21,7 +21,6 @@ const page = async ({
   searchParams: any;
 }) => {
   const result = await getQuestionById({ questionId: params.id });
-  // eslint-disable-next-line no-unused-vars
   const {
     _id,
     title,

@@ -79,6 +79,8 @@ export const getSpecificTag = async (params: GetQuestionsByTagIdParams) => {
 
     const questions = tag.questions;
 
+    console.log({ questions });
+
     return { tagTitle: tag.name, questions };
   } catch (error) {
     console.log(error);

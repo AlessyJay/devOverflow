@@ -6,15 +6,19 @@ import { formatNumber, getTimeStamp } from "@/lib/utils";
 
 const QuestionCards = ({
   id,
+  clerkId,
   title,
   author,
   createdAt,
   views,
-  upvote = [],
+  upvote,
+  downvote = [],
   tags,
   answers,
+  path,
 }: {
   id: string;
+  clerkId?: string;
   title: string;
   author: {
     id: string;
@@ -24,11 +28,13 @@ const QuestionCards = ({
   createdAt: Date;
   views: number;
   upvote: string[];
+  downvote?: string[];
   tags: {
     _id: string;
     name: string;
   }[];
   answers: Array<object>;
+  path?: string;
 }) => {
   console.log("This is the upvote: ", upvote);
   return (
@@ -62,27 +68,48 @@ const QuestionCards = ({
           isAuthor
           textStyle="body-meduim text-dark400_light700"
         />
-        <Metric
-          imgUrl="/assets/icons/upvote.svg"
-          alt="upvotes"
-          value={formatNumber(upvote.length)}
-          title="Votes"
-          textStyle="small-meduim text-dark400_light800"
-        />
-        <Metric
-          imgUrl="/assets/icons/message.svg"
-          alt="message"
-          value={answers.length}
-          title="Answers"
-          textStyle="small-meduim text-dark400_light800"
-        />
-        <Metric
-          imgUrl="/assets/icons/eye.svg"
-          alt="views"
-          value={formatNumber(views)}
-          title="Views"
-          textStyle="small-meduim text-dark400_light800"
-        />
+        {path === "profile" ? (
+          <>
+            <Metric
+              imgUrl="/assets/icons/upvote.svg"
+              alt="upvotes"
+              value={formatNumber(upvote.length)}
+              title="Votes"
+              textStyle="small-meduim text-dark400_light800"
+            />
+            <Metric
+              imgUrl="/assets/icons/downvote.svg"
+              alt="downvotes"
+              value={formatNumber(downvote.length)}
+              title="Votes"
+              textStyle="small-meduim text-dark400_light800"
+            />
+          </>
+        ) : (
+          <>
+            <Metric
+              imgUrl="/assets/icons/upvote.svg"
+              alt="upvotes"
+              value={formatNumber(upvote.length)}
+              title="Votes"
+              textStyle="small-meduim text-dark400_light800"
+            />
+            <Metric
+              imgUrl="/assets/icons/message.svg"
+              alt="message"
+              value={answers.length}
+              title="Answers"
+              textStyle="small-meduim text-dark400_light800"
+            />
+            <Metric
+              imgUrl="/assets/icons/eye.svg"
+              alt="views"
+              value={formatNumber(views)}
+              title="Views"
+              textStyle="small-meduim text-dark400_light800"
+            />
+          </>
+        )}
       </div>
     </div>
   );
