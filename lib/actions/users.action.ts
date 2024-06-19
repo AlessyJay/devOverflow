@@ -7,6 +7,8 @@ import {
   DeleteUserParams,
   GetAllTagsParams,
   GetSavedQuestionsParams,
+  GetUserByIdParams,
+  GetUserStatsParams,
   ToggleSaveQuestionParams,
   UpdateUserParams,
 } from "./shared.types";
@@ -14,6 +16,7 @@ import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
 import mongoose, { FilterQuery } from "mongoose";
 import Tag from "@/database/tag.model";
+import Answer from "@/database/answer.model";
 
 export const getAllUsers = async (params: GetAllTagsParams) => {
   try {
@@ -34,7 +37,7 @@ export const getAllUsers = async (params: GetAllTagsParams) => {
 
 export const getUserById = async ({ userId }: { userId: string }) => {
   try {
-    await connectToDB();
+    connectToDB();
 
     const user = await User.findOne({ clerkId: userId });
 
@@ -105,7 +108,7 @@ export const deleteUser = async (userData: DeleteUserParams) => {
 
 export const saveQuestion = async (params: ToggleSaveQuestionParams) => {
   try {
-    await connectToDB();
+    connectToDB();
 
     const { userId, questionId, path } = params;
 
@@ -140,7 +143,7 @@ export const saveQuestion = async (params: ToggleSaveQuestionParams) => {
 
 export const allSavedQuestions = async (params: GetSavedQuestionsParams) => {
   try {
-    await connectToDB();
+    connectToDB();
 
     // eslint-disable-next-line no-unused-vars
     const { clerkId, searchQuery, page = 1, pageSize = 10, filter } = params;
@@ -168,6 +171,60 @@ export const allSavedQuestions = async (params: GetSavedQuestionsParams) => {
     const savedQuestions = user.saved;
 
     return { questions: savedQuestions };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const userProfile = async (params: GetUserByIdParams) => {
+  try {
+    connectToDB();
+
+    const { userId } = params;
+
+    const user = await User.findOne({ userId });
+
+    if (!user) {
+      throw new Error("User not found!");
+    }
+
+    const totalQuestions = await Question.countDocuments({
+      author: user._id,
+    });
+    const totalAnswers = await Answer.countDocuments({
+      author: user._id,
+    });
+
+    return { user, totalQuestions, totalAnswers };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getUserQuestions = async (params: GetUserStatsParams) => {
+  try {
+    connectToDB();
+
+    // eslint-disable-next-line no-unused-vars
+    const { userId, page = 1, pageSize = 10 } = params;
+
+    const totalQuestions = await Question.countDocuments({ author: userId });
+
+    const userQuestions = await Question.find({ author: userId })
+      .sort({
+        views: -1,
+        upvotes: -1,
+      })
+      .populate({ path: "tags", model: Tag, select: "_id name" })
+      .populate({
+        path: "author",
+        model: User,
+        select: "_id clerkId name picture",
+      });
+
+    return { totalQuestions, questions: userQuestions };
   } catch (error) {
     console.log(error);
     throw error;

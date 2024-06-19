@@ -5,11 +5,13 @@ import {
   AnswerVoteParams,
   CreateAnswerParams,
   GetAnswersParams,
+  GetUserStatsParams,
 } from "./shared.types";
 import { connectToDB } from "../mongoose";
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
 import mongoose from "mongoose";
+import User from "@/database/user.model";
 
 export const CreateAnswer = async (params: CreateAnswerParams) => {
   try {
@@ -138,6 +140,33 @@ export const downvoteAnswer = async (params: AnswerVoteParams) => {
     }
 
     revalidatePath(path);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getUserAnswer = async (params: GetUserStatsParams) => {
+  try {
+    connectToDB();
+
+    // eslint-disable-next-line no-unused-vars
+    const { userId, page = 1, pageSize = 10 } = params;
+
+    const countAnswers = await Answer.countDocuments({ author: userId });
+
+    const answers = await Answer.find({ author: userId })
+      .sort({
+        upvoted: -1,
+      })
+      .populate({ path: "question", model: Question, select: "_id title" })
+      .populate({
+        path: "author",
+        model: User,
+        select: "_id clerkId name picture",
+      });
+
+    return { answers, totalAnswers: countAnswers };
   } catch (error) {
     console.log(error);
     throw error;

@@ -6,15 +6,19 @@ import { formatNumber, getTimeStamp } from "@/lib/utils";
 
 const QuestionCards = ({
   id,
+  clerkId,
   title,
   author,
   createdAt,
   views,
-  upvote = [],
+  upvote,
+  downvote = [],
   tags,
   answers,
+  type,
 }: {
   id: string;
+  clerkId?: string;
   title: string;
   author: {
     id: string;
@@ -24,13 +28,14 @@ const QuestionCards = ({
   createdAt: Date;
   views: number;
   upvote: string[];
+  downvote?: string[];
   tags: {
     _id: string;
     name: string;
   }[];
   answers: Array<object>;
+  type?: string;
 }) => {
-  console.log("This is the upvote: ", upvote);
   return (
     <div className="card-wrapper mb-10 rounded-[10px] p-9 sm:px-11">
       <div className="flex flex-col items-start gap-5 sm:flex-row">
@@ -46,11 +51,15 @@ const QuestionCards = ({
 
       {/* If sign in, add edit, delete action */}
 
-      <div className="mt-3.5 flex flex-wrap gap-2 text-black">
-        {tags.map((tag) => (
-          <RenderTag key={tag._id} id={tag._id} title={tag.name} />
-        ))}
-      </div>
+      {type === "answers" ? (
+        ""
+      ) : (
+        <div className="mt-3.5 flex flex-wrap gap-2 text-black">
+          {tags.map((tag) => (
+            <RenderTag key={tag._id} id={tag._id} title={tag.name} />
+          ))}
+        </div>
+      )}
 
       <div className="flex-between mt-6 w-full flex-wrap gap-3">
         <Metric
@@ -62,27 +71,48 @@ const QuestionCards = ({
           isAuthor
           textStyle="body-meduim text-dark400_light700"
         />
-        <Metric
-          imgUrl="/assets/icons/upvote.svg"
-          alt="upvotes"
-          value={formatNumber(upvote.length)}
-          title="Votes"
-          textStyle="small-meduim text-dark400_light800"
-        />
-        <Metric
-          imgUrl="/assets/icons/message.svg"
-          alt="message"
-          value={answers.length}
-          title="Answers"
-          textStyle="small-meduim text-dark400_light800"
-        />
-        <Metric
-          imgUrl="/assets/icons/eye.svg"
-          alt="views"
-          value={formatNumber(views)}
-          title="Views"
-          textStyle="small-meduim text-dark400_light800"
-        />
+        {type === "profile" ? (
+          <>
+            <Metric
+              imgUrl="/assets/icons/upvote.svg"
+              alt="upvotes"
+              value={formatNumber(upvote.length)}
+              title="Votes"
+              textStyle="small-meduim text-dark400_light800"
+            />
+            <Metric
+              imgUrl="/assets/icons/downvote.svg"
+              alt="downvotes"
+              value={formatNumber(downvote.length)}
+              title="Votes"
+              textStyle="small-meduim text-dark400_light800"
+            />
+          </>
+        ) : (
+          <>
+            <Metric
+              imgUrl="/assets/icons/upvote.svg"
+              alt="upvotes"
+              value={formatNumber(upvote.length)}
+              title="Votes"
+              textStyle="small-meduim text-dark400_light800"
+            />
+            <Metric
+              imgUrl="/assets/icons/message.svg"
+              alt="message"
+              value={answers.length}
+              title="Answers"
+              textStyle="small-meduim text-dark400_light800"
+            />
+            <Metric
+              imgUrl="/assets/icons/eye.svg"
+              alt="views"
+              value={formatNumber(views)}
+              title="Views"
+              textStyle="small-meduim text-dark400_light800"
+            />
+          </>
+        )}
       </div>
     </div>
   );
