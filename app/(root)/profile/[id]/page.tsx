@@ -1,7 +1,7 @@
 import { URLProps } from "@/Types";
 import ProfileLink from "@/components/shared/ProfileLink";
 import Stats from "@/components/shared/Stats";
-import AnswerTabs from "@/components/shared/questions/AnswersTab";
+// import AnswerTabs from "@/components/shared/questions/AnswersTab";
 import QuestionsTab from "@/components/shared/questions/QuestionsTab";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,6 +18,9 @@ const Page = async ({ params, searchParams }: URLProps) => {
   const userInfo = await userProfile({ userId: params.id });
 
   const { day, month, year } = getJoinedDate(userInfo.user.joinedAt.toString());
+
+  // Ensure clerkId is a string or undefined
+  const validClerkId = clerkId ?? undefined;
   return (
     <>
       <div className="flex flex-col-reverse items-start justify-between sm:flex-row">
@@ -108,12 +111,16 @@ const Page = async ({ params, searchParams }: URLProps) => {
             <QuestionsTab
               searchParams={searchParams}
               userId={userInfo.user._id}
-              // clerkId={clerkId}
+              clerkId={validClerkId}
             />
           </TabsContent>
           <TabsContent value="answers">
             {/* todo: Answers component */}
-            <AnswerTabs userID={params.id} />
+            {/* <AnswerTabs
+              searchParams={searchParams}
+              userId={userInfo.user._id}
+              clerkId={validClerkId}
+            /> */}
           </TabsContent>
         </Tabs>
       </div>

@@ -5,6 +5,7 @@ import {
   AnswerVoteParams,
   CreateAnswerParams,
   GetAnswersParams,
+  GetUserStatsParams,
 } from "./shared.types";
 import { connectToDB } from "../mongoose";
 import { revalidatePath } from "next/cache";
@@ -145,41 +146,27 @@ export const downvoteAnswer = async (params: AnswerVoteParams) => {
   }
 };
 
-export const getUserAnswer = async ({
-  userId,
-  page = 1,
-  pageSize = 10,
-}: {
-  userId: string;
-  page?: number;
-  pageSize?: number;
-}) => {
+export const getUserAnswer = async (params: GetUserStatsParams) => {
   try {
     connectToDB();
 
-    const user = await User.findOne({ userId });
+    // eslint-disable-next-line no-unused-vars
+    const { userId, page = 1, pageSize = 10 } = params;
 
-    if (!user) {
-      throw new Error("User not found!");
-    }
+    const countAnswers = await Answer.countDocuments({ author: userId });
 
-    const authorId = new mongoose.Types.ObjectId(user._id);
+    const answers = await Answer.find({ author: userId })
+      .sort({
+        upvoted: -1,
+      })
+      .populate({ path: "question", model: Question, select: "_id title" })
+      .populate({
+        path: "author",
+        model: User,
+        select: "_id clerkId name picture",
+      });
 
-    const skip = (page - 1) * pageSize;
-
-    const answers = await Answer.find({ author: authorId })
-      .skip(skip)
-      .limit(pageSize)
-      .populate([
-        { path: "author", model: User, select: "_id clerkId name picture" },
-        {
-          path: "question",
-          model: Question,
-          select: "_id title content tags views upvotes downvotes",
-        },
-      ]);
-
-    return { answers };
+    return { answers, totalAnswers: countAnswers };
   } catch (error) {
     console.log(error);
     throw error;

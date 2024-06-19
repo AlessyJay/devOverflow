@@ -1,43 +1,35 @@
+import QuestionCards from "@/components/Cards/QuestionCards";
+import { getUserAnswer } from "@/lib/actions/answers.action";
+import { SearchParamsProps } from "@/Types";
 import React from "react";
-// import QuestionCards from "@/components/Cards/QuestionCards";
-// import NoResult from "../NoResult";
-// import { getUserAnswer } from "@/lib/actions/answers.action";
 
-const AnswersTab = async ({ userID }: { userID: string }) => {
-  // const answers = await getUserAnswer({ userId: userID });
+interface Props extends SearchParamsProps {
+  userId: string;
+  clerkId: string;
+}
+
+const AnswersTab = async ({ userId, clerkId }: Props) => {
+  const result = await getUserAnswer({ userId, page: 1 });
+
+  console.log(result);
   return (
-    <div>
-      {/* {answers.answers.length > 0 ? (
-        answers.answers.map((item) => {
-          return (
-            <QuestionCards
-              key={item._id}
-              id={item._id}
-              title={item.content}
-              author={{
-                id: item.author.clerkId,
-                name: item.author.name,
-                picture: item.author.picture,
-              }}
-              createdAt={item.createdAt}
-              views={0}
-              upvote={item.upvotes || []}
-              downvote={item.downvotes || []}
-              tags={[]}
-              answers={[]}
-              path="profile"
-            />
-          );
-        })
-      ) : (
-        <NoResult
-          title="This amazing mind hasn't been posted yet."
-          description="We hope in the future there will be some posts from them."
-          link="/ask-question"
-          linkTitle="Ask a Question"
+    <>
+      {result.answers.map((item) => (
+        <QuestionCards
+          key={item._id}
+          id={item._id}
+          clerkId={clerkId}
+          title={item.title}
+          author={item.author}
+          createdAt={item.createdAt}
+          views={item.views}
+          upvote={item.upvoted.length}
+          tags={item.tags}
+          answers={item.answers}
+          type="answers"
         />
-      )} */}
-    </div>
+      ))}
+    </>
   );
 };
 

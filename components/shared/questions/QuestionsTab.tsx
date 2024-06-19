@@ -8,27 +8,29 @@ interface Props extends SearchParamsProps {
   clerkId?: string;
 }
 
-const QuestionsTab = async ({ searchParams, userId, clerkId }: Props) => {
+// searchProps
+
+const QuestionsTab = async ({ userId, clerkId }: Props) => {
   const result = await getUserQuestions({ userId, page: 1 });
 
-  console.log(result);
+  console.log();
   return (
-    <div>
+    <>
       {result.questions.map((item) => (
         <QuestionCards
           key={item._id}
           id={item._id}
           clerkId={clerkId}
           title={item.title}
-          author={item.upvotes}
+          author={item.author}
           createdAt={item.createdAt}
           views={item.views}
-          upvote={item.upvotes}
+          upvote={item.upvotes.length}
           tags={item.tags}
           answers={item.answers}
         />
       ))}
-    </div>
+    </>
   );
 };
 

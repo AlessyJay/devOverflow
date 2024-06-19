@@ -207,6 +207,7 @@ export const getUserQuestions = async (params: GetUserStatsParams) => {
   try {
     connectToDB();
 
+    // eslint-disable-next-line no-unused-vars
     const { userId, page = 1, pageSize = 10 } = params;
 
     const totalQuestions = await Question.countDocuments({ author: userId });
@@ -216,8 +217,12 @@ export const getUserQuestions = async (params: GetUserStatsParams) => {
         views: -1,
         upvotes: -1,
       })
-      .populate("tags", "_id name")
-      .populate("author", "_id clerkId name picture");
+      .populate({ path: "tags", model: Tag, select: "_id name" })
+      .populate({
+        path: "author",
+        model: User,
+        select: "_id clerkId name picture",
+      });
 
     return { totalQuestions, questions: userQuestions };
   } catch (error) {

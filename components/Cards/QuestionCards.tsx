@@ -15,7 +15,7 @@ const QuestionCards = ({
   downvote = [],
   tags,
   answers,
-  path,
+  type,
 }: {
   id: string;
   clerkId?: string;
@@ -34,9 +34,8 @@ const QuestionCards = ({
     name: string;
   }[];
   answers: Array<object>;
-  path?: string;
+  type?: string;
 }) => {
-  console.log("This is the upvote: ", upvote);
   return (
     <div className="card-wrapper mb-10 rounded-[10px] p-9 sm:px-11">
       <div className="flex flex-col items-start gap-5 sm:flex-row">
@@ -52,11 +51,15 @@ const QuestionCards = ({
 
       {/* If sign in, add edit, delete action */}
 
-      <div className="mt-3.5 flex flex-wrap gap-2 text-black">
-        {tags.map((tag) => (
-          <RenderTag key={tag._id} id={tag._id} title={tag.name} />
-        ))}
-      </div>
+      {type === "answers" ? (
+        ""
+      ) : (
+        <div className="mt-3.5 flex flex-wrap gap-2 text-black">
+          {tags.map((tag) => (
+            <RenderTag key={tag._id} id={tag._id} title={tag.name} />
+          ))}
+        </div>
+      )}
 
       <div className="flex-between mt-6 w-full flex-wrap gap-3">
         <Metric
@@ -68,7 +71,7 @@ const QuestionCards = ({
           isAuthor
           textStyle="body-meduim text-dark400_light700"
         />
-        {path === "profile" ? (
+        {type === "profile" ? (
           <>
             <Metric
               imgUrl="/assets/icons/upvote.svg"
