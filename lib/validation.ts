@@ -11,3 +11,11 @@ export const AnswerSchema = z.object({
     .string()
     .min(20, { message: "Answer should have more than 20 characters!" }),
 });
+
+export const EditProfileSchema = z.object({
+  name: z.string().min(2),
+  username: z.string(),
+  portfolioWebsite: z.string().optional(),
+  location: z.string().optional(),
+  bio: z.string().optional(),
+});
