@@ -87,3 +87,16 @@ export const getSpecificTag = async (params: GetQuestionsByTagIdParams) => {
     throw error;
   }
 };
+
+export const getHotTags = async (params: GetAllTagsParams) => {
+  try {
+    connectToDB();
+
+    const tags = await Tag.find().sort({ questions: -1 }).limit(10);
+
+    return { tags };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};

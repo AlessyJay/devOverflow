@@ -15,6 +15,7 @@ import React from "react";
 
 const Page = async ({ params, searchParams }: URLProps) => {
   const { userId: clerkId } = auth();
+
   const userInfo = await userProfile({ userId: params.id });
 
   const { day, month, year } = getJoinedDate(userInfo.user.joinedAt.toString());
