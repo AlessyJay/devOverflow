@@ -233,3 +233,16 @@ export const editQuestion = async (params: EditQuestionParams) => {
     throw error;
   }
 };
+
+export const getHotQuestions = async (params: GetQuestionsParams) => {
+  try {
+    connectToDB();
+
+    const questions = await Question.find().sort({ upvotes: -1 }).limit(6);
+
+    return { questions };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};

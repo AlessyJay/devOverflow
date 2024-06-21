@@ -21,6 +21,7 @@ import { Badge } from "../ui/badge";
 import Image from "next/image";
 import { CreateQuestion, editQuestion } from "@/lib/actions/questions.action";
 import { usePathname, useRouter } from "next/navigation";
+// import QuillEditor from "../shared/QuillEditor";
 
 interface props {
   mongoUserId: string;
@@ -156,6 +157,7 @@ const Question = ({ mongoUserId, type, questionDetails }: props) => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 {/* Todo: add an editor component */}
+                {/* <QuillEditor /> */}
                 <Editor
                   apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY}
                   onInit={(_evt, editor) =>
