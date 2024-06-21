@@ -4,12 +4,12 @@ import React from "react";
 import { getAllTags } from "@/lib/actions/tags.action";
 import NoResult from "@/components/shared/NoResult";
 import Link from "next/link";
-import { getTimeStamp } from "@/lib/utils";
+import { getJoinedDate, getTimeStamp } from "@/lib/utils";
 import { SearchParamsProps } from "@/Types";
 
 const page = async ({ searchParams }: SearchParamsProps) => {
   const result = await getAllTags({
-    searchQuery: searchParams.q,
+    searchQuery: searchParams.search,
     filter: searchParams.filter,
     page: searchParams.page ? +searchParams.page : 1,
   });
@@ -25,6 +25,9 @@ const page = async ({ searchParams }: SearchParamsProps) => {
       <section className="mt-12 flex flex-wrap gap-4">
         {result.tags.length > 0 ? (
           result.tags.map((tag) => {
+            const { day, month, year } = getJoinedDate(
+              tag.createdAt.toString(),
+            );
             return (
               <Link
                 key={tag._id}
@@ -45,8 +48,9 @@ const page = async ({ searchParams }: SearchParamsProps) => {
                     Questions
                   </p>
 
-                  <p className="mt-5">
-                    Was created at {getTimeStamp(tag.createdAt)}
+                  <p className="text-dark300_light900 mt-5">
+                    Created on {day} {month} {year}
+                    <br />({getTimeStamp(tag.createdAt)})
                   </p>
                 </span>
               </Link>

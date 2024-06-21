@@ -109,7 +109,10 @@ const page = async ({
         />
       </div>
 
-      <ParseHTML data={content} className="rounded-md border p-5 shadow-sm" />
+      <ParseHTML
+        data={content}
+        className="text-dark300_light900 rounded-md border p-5 shadow-sm"
+      />
 
       <div className="mt-8 flex flex-wrap gap-2">
         {tags.map((tag: any) => (

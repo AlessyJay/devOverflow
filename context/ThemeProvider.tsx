@@ -32,8 +32,6 @@ export default function ThemeProProvider({
     handleThemeChange();
   }, [mode]);
 
-  console.log("Mode: ", mode);
-
   return (
     <ThemeContext.Provider value={{ mode, setMode }}>
       {children}

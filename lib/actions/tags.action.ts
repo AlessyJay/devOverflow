@@ -40,7 +40,16 @@ export const getAllTags = async (params: GetAllTagsParams) => {
   try {
     connectToDB();
 
-    const tags = await Tag.find({}).populate("questions");
+    // eslint-disable-next-line no-unused-vars
+    const { page, pageSize, filter, searchQuery } = params;
+
+    const query: FilterQuery<typeof Tag> = {};
+
+    if (searchQuery) {
+      query.$or = [{ name: { $regex: new RegExp(searchQuery, "i") } }];
+    }
+
+    const tags = await Tag.find(query).populate("questions");
 
     return { tags };
   } catch (error) {

@@ -22,13 +22,20 @@ export const getAllUsers = async (params: GetAllTagsParams) => {
   try {
     connectToDB();
 
-    // const { page = 1, pageSize = 20, filter, searchQuery } = params;
+    const { searchQuery } = params;
 
-    const allUser = await User.find({}).sort({ createdAt: -1 });
+    const query: FilterQuery<typeof User> = {};
 
-    console.log(allUser);
+    if (searchQuery) {
+      query.$or = [
+        { name: { $regex: new RegExp(searchQuery, "i") } },
+        { username: { $regex: new RegExp(searchQuery, "i") } },
+      ];
+    }
 
-    return allUser;
+    const allUser = await User.find(query).sort({ createdAt: -1 });
+
+    return { allUser };
   } catch (error) {
     console.log(error);
     throw error;
@@ -152,7 +159,7 @@ export const allSavedQuestions = async (params: GetSavedQuestionsParams) => {
       ? { title: { $regex: new RegExp(searchQuery, "i") } }
       : {};
 
-    const user = await User.findOne({ clerkId }).populate({
+    const user = await User.findOne({ clerkId, query }).populate({
       path: "saved",
       match: query,
       options: {

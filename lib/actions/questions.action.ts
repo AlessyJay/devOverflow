@@ -13,7 +13,7 @@ import {
 } from "./shared.types";
 import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
-import mongoose from "mongoose";
+import mongoose, { FilterQuery } from "mongoose";
 import Answer from "@/database/answer.model";
 import Interaction from "@/database/interaction.model";
 
@@ -21,7 +21,18 @@ export const getQuestions = async (params: GetQuestionsParams) => {
   try {
     connectToDB();
 
-    const questions = await Question.find({})
+    const { searchQuery } = params;
+
+    const query: FilterQuery<typeof Question> = {};
+
+    if (searchQuery) {
+      query.$or = [
+        { title: { $regex: new RegExp(searchQuery, "i") } },
+        { content: { $regex: new RegExp(searchQuery, "i") } },
+      ];
+    }
+
+    const questions = await Question.find(query)
       .populate({ path: "tags", model: Tag })
       .populate({ path: "author", model: User })
       .sort({ createdAt: -1 });
@@ -241,6 +252,15 @@ export const getHotQuestions = async (params: GetQuestionsParams) => {
     const questions = await Question.find().sort({ upvotes: -1 }).limit(6);
 
     return { questions };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getQuestionsFilter = async (params: GetQuestionsParams) => {
+  try {
+    connectToDB();
   } catch (error) {
     console.log(error);
     throw error;
