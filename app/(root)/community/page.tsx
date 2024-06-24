@@ -1,4 +1,5 @@
-import { HomePageFilters } from "@/Constant/filters";
+import { UserFilters } from "@/Constant/filters";
+import { SearchParamsProps } from "@/Types";
 import CommunityCards from "@/components/Cards/CommunityCards";
 import Filter from "@/components/shared/search/Filter";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
@@ -6,8 +7,11 @@ import { getAllUsers } from "@/lib/actions/users.action";
 import Link from "next/link";
 import React from "react";
 
-const page = async () => {
-  const result = await getAllUsers({});
+const page = async ({ searchParams }: SearchParamsProps) => {
+  const result = await getAllUsers({
+    searchQuery: searchParams.search,
+    filter: searchParams.filter,
+  });
   return (
     <>
       <h1 className="h1-bold text-dark100_light900">All Developers</h1>
@@ -22,14 +26,14 @@ const page = async () => {
         />
 
         <Filter
-          filters={HomePageFilters}
+          filters={UserFilters}
           otherClasses="min-h-[56px] sm:min-w-[170px]"
         />
       </div>
 
       <section className="mt-12 flex flex-wrap gap-4">
-        {result.length > 0 ? (
-          result.map((user) => (
+        {result.allUser.length > 0 ? (
+          result.allUser.map((user) => (
             <>
               <CommunityCards key={user.id} user={user} />
             </>

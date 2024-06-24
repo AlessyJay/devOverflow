@@ -151,6 +151,7 @@ export interface GetUserStatsParams {
   userId: string;
   page?: number;
   pageSize?: number;
+  filter?: string;
 }
 
 export interface DeleteUserParams {

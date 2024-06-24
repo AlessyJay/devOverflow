@@ -3,7 +3,6 @@ import Link from "next/link";
 import React from "react";
 import { Badge } from "../ui/badge";
 import { getTopInteractedTags } from "@/lib/actions/tags.action";
-import RenderTag from "../shared/RenderTag";
 
 interface Props {
   user: {
@@ -36,17 +35,27 @@ const CommunityCards = async ({ user }: Props) => {
         />
 
         <span className="mt-4 text-center">
-          <h3 className="h3-bold text-dark200_light900">{name}</h3>
-          <p className="text-light400_light500">@{username}</p>
+          <h3 className="h3-bold text-dark200_light900 line-clamp-1">{name}</h3>
+          <p className="text-light400_light500">@{username.toLowerCase()}</p>
         </span>
 
         <span className="mt-5">
           {interactedTags.length > 0 ? (
-            <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
               {interactedTags?.map((tag) => (
-                <RenderTag key={tag.id} id={tag.id} title={tag.title} />
+                <>
+                  <span
+                    className="flex justify-between gap-2"
+                    key={tag.id}
+                    id={tag.id}
+                  >
+                    <Badge className="subtle-medium background-light800_dark300 text-light400_light500 rounded-md border-none px-4 py-2 uppercase">
+                      {tag.title}
+                    </Badge>
+                  </span>
+                </>
               ))}
-            </div>
+            </span>
           ) : (
             <Badge>No tags, yet.</Badge>
           )}

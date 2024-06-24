@@ -13,24 +13,30 @@ const RightSideBar = async () => {
       <div className="flex flex-1 flex-col gap-6">
         <h3 className="h3-bold text-dark200_light900">Top Questions</h3>
         <div className="mt-7 flex w-full flex-col gap-[30px]">
-          {result.questions.map((item) => (
-            <Link
-              href={`/question/${item._id}`}
-              key={item.id}
-              className="flex cursor-pointer items-center justify-between gap-7"
-            >
-              <p className="body-medium text-dark500_light700 line-clamp-1">
-                {item.title}
-              </p>
-              <Image
-                src="/assets/icons/chevron-right.svg"
-                alt="chevron right"
-                width={20}
-                height={20}
-                className="invert-colors"
-              />
-            </Link>
-          ))}
+          {result.questions.length > 0 ? (
+            result.questions.map((item) => (
+              <Link
+                href={`/question/${item._id}`}
+                key={item.id}
+                className="flex cursor-pointer items-center justify-between gap-7"
+              >
+                <p className="body-medium text-dark500_light700 line-clamp-1">
+                  {item.title}
+                </p>
+                <Image
+                  src="/assets/icons/chevron-right.svg"
+                  alt="chevron right"
+                  width={20}
+                  height={20}
+                  className="invert-colors"
+                />
+              </Link>
+            ))
+          ) : (
+            <h3 className="text-dark300_light900 text-center text-lg font-semibold">
+              There are no questions, yet.
+            </h3>
+          )}
         </div>
       </div>
 

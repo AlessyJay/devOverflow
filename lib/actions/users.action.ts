@@ -22,13 +22,33 @@ export const getAllUsers = async (params: GetAllTagsParams) => {
   try {
     connectToDB();
 
-    // const { page = 1, pageSize = 20, filter, searchQuery } = params;
+    const { searchQuery, filter } = params;
 
-    const allUser = await User.find({}).sort({ createdAt: -1 });
+    const query: FilterQuery<typeof User> = {};
 
-    console.log(allUser);
+    if (searchQuery) {
+      query.$or = [
+        { name: { $regex: new RegExp(searchQuery, "i") } },
+        { username: { $regex: new RegExp(searchQuery, "i") } },
+      ];
+    }
 
-    return allUser;
+    let sortUsers = {};
+
+    switch (filter) {
+      case "new_users":
+        sortUsers = { joinedAt: -1 };
+        break;
+      case "old_users":
+        sortUsers = { joinedAt: 1 };
+        break;
+      case "top_contributors":
+        sortUsers = { reputation: -1 };
+    }
+
+    const allUser = await User.find(query).sort(sortUsers);
+
+    return { allUser };
   } catch (error) {
     console.log(error);
     throw error;
@@ -53,6 +73,8 @@ export const createUser = async (userData: CreateUserParams) => {
     connectToDB();
 
     const newUser = await User.create(userData);
+
+    console.log("New user created: ", newUser);
 
     return newUser;
   } catch (error) {
@@ -152,11 +174,34 @@ export const allSavedQuestions = async (params: GetSavedQuestionsParams) => {
       ? { title: { $regex: new RegExp(searchQuery, "i") } }
       : {};
 
-    const user = await User.findOne({ clerkId }).populate({
+    let sortOptions = {};
+
+    switch (filter) {
+      // Collections page
+      case "most_recent":
+        sortOptions = { createdAt: -1 };
+        break;
+      case "oldest":
+        sortOptions = { createdAt: 1 };
+        break;
+      case "most_voted":
+        sortOptions = { upvotes: -1 };
+        break;
+      case "most_viewed":
+        sortOptions = { views: -1 };
+        break;
+      case "most_answered":
+        sortOptions = { answers: -1 };
+        break;
+      default:
+        break;
+    }
+
+    const user = await User.findOne({ clerkId, query }).populate({
       path: "saved",
       match: query,
       options: {
-        sort: { createdAt: -1 },
+        sort: sortOptions,
       },
       populate: [
         { path: "tags", model: Tag, select: "_id name" },
@@ -183,7 +228,7 @@ export const userProfile = async (params: GetUserByIdParams) => {
 
     const { userId } = params;
 
-    const user = await User.findOne({ userId });
+    const user = await User.findOne({ clerkId: userId });
 
     if (!user) {
       throw new Error("User not found!");

@@ -1,4 +1,5 @@
 import { QuestionFilters } from "@/Constant/filters";
+import { SearchParamsProps } from "@/Types";
 import QuestionCards from "@/components/Cards/QuestionCards";
 import NoResult from "@/components/shared/NoResult";
 import Filter from "@/components/shared/search/Filter";
@@ -18,31 +19,32 @@ interface itemProps {
   answers: object[];
 }
 
-const page = async () => {
+const page = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = auth();
 
   if (!userId) return null;
 
   const result = await allSavedQuestions({
     clerkId: userId,
+    searchQuery: searchParams.search,
+    filter: searchParams.filter,
   });
   return (
     <>
-      <h1 className="h1-bold text-dark100_light900">Favourite Questions</h1>
+      <h1 className="h1-bold text-dark100_light900">Saved Questions</h1>
 
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
         <LocalSearchBar
-          route="/"
+          route="/collection"
           iconPosition="left"
           imgSrc="/assets/icons/search.svg"
-          placeholder="Search for Questions"
+          placeholder="Search for Favourite Questions"
           otherClasses="flex-1"
         />
 
         <Filter
           filters={QuestionFilters}
           otherClasses="min-h-[56px] sm:min-w-[170px]"
-          containerClasses="hidden max-md:flex"
         />
       </div>
 
