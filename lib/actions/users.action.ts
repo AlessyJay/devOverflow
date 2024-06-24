@@ -22,7 +22,7 @@ export const getAllUsers = async (params: GetAllTagsParams) => {
   try {
     connectToDB();
 
-    const { searchQuery } = params;
+    const { searchQuery, filter } = params;
 
     const query: FilterQuery<typeof User> = {};
 
@@ -33,7 +33,20 @@ export const getAllUsers = async (params: GetAllTagsParams) => {
       ];
     }
 
-    const allUser = await User.find(query).sort({ createdAt: -1 });
+    let sortUsers = {};
+
+    switch (filter) {
+      case "newest":
+        sortUsers = { createdAt: -1 };
+        break;
+      case "frequent":
+        sortUsers = { views: -1 };
+        break;
+      case "unanswered":
+        sortUsers = { answers: { $size: 0 } };
+    }
+
+    const allUser = await User.find(query).sort(sortUsers);
 
     return { allUser };
   } catch (error) {
@@ -60,6 +73,8 @@ export const createUser = async (userData: CreateUserParams) => {
     connectToDB();
 
     const newUser = await User.create(userData);
+
+    console.log("New user created: ", newUser);
 
     return newUser;
   } catch (error) {

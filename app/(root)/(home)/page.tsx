@@ -10,7 +10,10 @@ import { getQuestions } from "@/lib/actions/questions.action";
 import Link from "next/link";
 
 export default async function Home({ searchParams }: SearchParamsProps) {
-  const result = await getQuestions({ searchQuery: searchParams.search });
+  const result = await getQuestions({
+    searchQuery: searchParams.search,
+    filter: searchParams.filter,
+  });
   return (
     <>
       <div className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
