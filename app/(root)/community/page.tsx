@@ -1,4 +1,4 @@
-import { HomePageFilters } from "@/Constant/filters";
+import { UserFilters } from "@/Constant/filters";
 import { SearchParamsProps } from "@/Types";
 import CommunityCards from "@/components/Cards/CommunityCards";
 import Filter from "@/components/shared/search/Filter";
@@ -26,7 +26,7 @@ const page = async ({ searchParams }: SearchParamsProps) => {
         />
 
         <Filter
-          filters={HomePageFilters}
+          filters={UserFilters}
           otherClasses="min-h-[56px] sm:min-w-[170px]"
         />
       </div>

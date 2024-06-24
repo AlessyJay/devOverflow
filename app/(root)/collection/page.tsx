@@ -27,10 +27,11 @@ const page = async ({ searchParams }: SearchParamsProps) => {
   const result = await allSavedQuestions({
     clerkId: userId,
     searchQuery: searchParams.search,
+    filter: searchParams.filter,
   });
   return (
     <>
-      <h1 className="h1-bold text-dark100_light900">Favourite Questions</h1>
+      <h1 className="h1-bold text-dark100_light900">Saved Questions</h1>
 
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
         <LocalSearchBar
@@ -44,7 +45,6 @@ const page = async ({ searchParams }: SearchParamsProps) => {
         <Filter
           filters={QuestionFilters}
           otherClasses="min-h-[56px] sm:min-w-[170px]"
-          containerClasses="hidden max-md:flex"
         />
       </div>
 

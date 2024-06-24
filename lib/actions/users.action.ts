@@ -36,14 +36,14 @@ export const getAllUsers = async (params: GetAllTagsParams) => {
     let sortUsers = {};
 
     switch (filter) {
-      case "newest":
-        sortUsers = { createdAt: -1 };
+      case "new_users":
+        sortUsers = { joinedAt: -1 };
         break;
-      case "frequent":
-        sortUsers = { views: -1 };
+      case "old_users":
+        sortUsers = { joinedAt: 1 };
         break;
-      case "unanswered":
-        sortUsers = { answers: { $size: 0 } };
+      case "top_contributors":
+        sortUsers = { reputation: -1 };
     }
 
     const allUser = await User.find(query).sort(sortUsers);
@@ -174,11 +174,34 @@ export const allSavedQuestions = async (params: GetSavedQuestionsParams) => {
       ? { title: { $regex: new RegExp(searchQuery, "i") } }
       : {};
 
+    let sortOptions = {};
+
+    switch (filter) {
+      // Collections page
+      case "most_recent":
+        sortOptions = { createdAt: -1 };
+        break;
+      case "oldest":
+        sortOptions = { createdAt: 1 };
+        break;
+      case "most_voted":
+        sortOptions = { upvotes: -1 };
+        break;
+      case "most_viewed":
+        sortOptions = { views: -1 };
+        break;
+      case "most_answered":
+        sortOptions = { answers: -1 };
+        break;
+      default:
+        break;
+    }
+
     const user = await User.findOne({ clerkId, query }).populate({
       path: "saved",
       match: query,
       options: {
-        sort: { createdAt: -1 },
+        sort: sortOptions,
       },
       populate: [
         { path: "tags", model: Tag, select: "_id name" },
@@ -205,7 +228,7 @@ export const userProfile = async (params: GetUserByIdParams) => {
 
     const { userId } = params;
 
-    const user = await User.findOne({ userId });
+    const user = await User.findOne({ clerkId: userId });
 
     if (!user) {
       throw new Error("User not found!");

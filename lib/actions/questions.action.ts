@@ -33,6 +33,7 @@ export const getQuestions = async (params: GetQuestionsParams) => {
     }
 
     let sortOptions = {};
+
     switch (filter) {
       case "newest":
         sortOptions = { createdAt: -1 };
@@ -42,6 +43,7 @@ export const getQuestions = async (params: GetQuestionsParams) => {
         break;
       case "unanswered":
         query.answers = { $size: 0 };
+        sortOptions = { createdAt: -1 };
         break;
       case "recommended":
         break;

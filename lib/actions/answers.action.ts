@@ -153,14 +153,31 @@ export const getUserAnswer = async (params: GetUserStatsParams) => {
     connectToDB();
 
     // eslint-disable-next-line no-unused-vars
-    const { userId, page = 1, pageSize = 10 } = params;
+    const { userId, page = 1, pageSize = 10, filter } = params;
 
     const countAnswers = await Answer.countDocuments({ author: userId });
 
+    let sortAnswers = {};
+
+    switch (filter) {
+      case "highestUpvotes":
+        sortAnswers = { upvoted: -1 };
+        break;
+      case "lowestUpvotes":
+        sortAnswers = { upvoted: 1 };
+        break;
+      case "recent":
+        sortAnswers = { createdAt: -1 };
+        break;
+      case "old":
+        sortAnswers = { createdAt: 1 };
+        break;
+      default:
+        break;
+    }
+
     const answers = await Answer.find({ author: userId })
-      .sort({
-        upvoted: -1,
-      })
+      .sort(sortAnswers)
       .populate({ path: "question", model: Question, select: "_id title" })
       .populate({
         path: "author",
