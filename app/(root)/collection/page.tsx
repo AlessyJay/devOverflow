@@ -2,6 +2,7 @@ import { QuestionFilters } from "@/Constant/filters";
 import { SearchParamsProps } from "@/Types";
 import QuestionCards from "@/components/Cards/QuestionCards";
 import NoResult from "@/components/shared/NoResult";
+import Pagination from "@/components/shared/Pagination";
 import Filter from "@/components/shared/search/Filter";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
 import { allSavedQuestions } from "@/lib/actions/users.action";
@@ -28,6 +29,7 @@ const page = async ({ searchParams }: SearchParamsProps) => {
     clerkId: userId,
     searchQuery: searchParams.search,
     filter: searchParams.filter,
+    page: searchParams.page ? +searchParams.page : 1,
   });
   return (
     <>
@@ -74,6 +76,13 @@ const page = async ({ searchParams }: SearchParamsProps) => {
               linkTitle="Ask a Question"
             />
           )}
+        </div>
+
+        <div className="mt-10">
+          <Pagination
+            isNext={result.isNext}
+            pageNumber={searchParams.page ? +searchParams.page : 1}
+          />
         </div>
       </section>
     </>

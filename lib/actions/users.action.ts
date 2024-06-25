@@ -22,9 +22,11 @@ export const getAllUsers = async (params: GetAllTagsParams) => {
   try {
     connectToDB();
 
-    const { searchQuery, filter } = params;
+    const { searchQuery, filter, page = 1, pageSize = 15 } = params;
 
     const query: FilterQuery<typeof User> = {};
+
+    const skip = (page - 1) * pageSize;
 
     if (searchQuery) {
       query.$or = [
@@ -46,9 +48,15 @@ export const getAllUsers = async (params: GetAllTagsParams) => {
         sortUsers = { reputation: -1 };
     }
 
-    const allUser = await User.find(query).sort(sortUsers);
+    const totalUsers = await User.countDocuments(query);
 
-    return { allUser };
+    const allUser = await User.find(query)
+      .sort(sortUsers)
+      .skip(skip)
+      .limit(pageSize);
+    const isNext = totalUsers > skip + allUser.length;
+
+    return { allUser, isNext };
   } catch (error) {
     console.log(error);
     throw error;
@@ -168,11 +176,13 @@ export const allSavedQuestions = async (params: GetSavedQuestionsParams) => {
     connectToDB();
 
     // eslint-disable-next-line no-unused-vars
-    const { clerkId, searchQuery, page = 1, pageSize = 10, filter } = params;
+    const { clerkId, searchQuery, page = 1, pageSize = 15, filter } = params;
 
     const query: FilterQuery<typeof Question> = searchQuery
       ? { title: { $regex: new RegExp(searchQuery, "i") } }
       : {};
+
+    const skip = (page - 1) * pageSize;
 
     let sortOptions = {};
 
@@ -202,6 +212,8 @@ export const allSavedQuestions = async (params: GetSavedQuestionsParams) => {
       match: query,
       options: {
         sort: sortOptions,
+        skip,
+        limit: pageSize,
       },
       populate: [
         { path: "tags", model: Tag, select: "_id name" },
@@ -215,7 +227,10 @@ export const allSavedQuestions = async (params: GetSavedQuestionsParams) => {
 
     const savedQuestions = user.saved;
 
-    return { questions: savedQuestions };
+    const totalUsers = await User.countDocuments(query);
+    const isNext = totalUsers > skip + savedQuestions.length;
+
+    return { questions: savedQuestions, isNext };
   } catch (error) {
     console.log(error);
     throw error;

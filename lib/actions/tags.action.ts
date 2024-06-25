@@ -41,13 +41,15 @@ export const getAllTags = async (params: GetAllTagsParams) => {
     connectToDB();
 
     // eslint-disable-next-line no-unused-vars
-    const { page, pageSize, filter, searchQuery } = params;
+    const { page = 1, pageSize = 15, filter, searchQuery } = params;
 
     const query: FilterQuery<typeof Tag> = {};
 
     if (searchQuery) {
       query.$or = [{ name: { $regex: new RegExp(searchQuery, "i") } }];
     }
+
+    const skip = (page - 1) * pageSize;
 
     let sortOptions = {};
 
@@ -68,9 +70,15 @@ export const getAllTags = async (params: GetAllTagsParams) => {
         break;
     }
 
-    const tags = await Tag.find(query).populate("questions").sort(sortOptions);
+    const tags = await Tag.find(query)
+      .populate("questions")
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(pageSize);
+    const totalTags = await Tag.countDocuments(query);
+    const isNext = totalTags > skip + tags.length;
 
-    return { tags };
+    return { tags, isNext };
   } catch (error) {
     console.log(error);
     throw error;
