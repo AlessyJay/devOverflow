@@ -3,6 +3,7 @@ import { SearchParamsProps } from "@/Types";
 import QuestionCards from "@/components/Cards/QuestionCards";
 import HomeFilters from "@/components/Home/HomeFilter";
 import NoResult from "@/components/shared/NoResult";
+import Pagination from "@/components/shared/Pagination";
 import Filter from "@/components/shared/search/Filter";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ export default async function Home({ searchParams }: SearchParamsProps) {
   const result = await getQuestions({
     searchQuery: searchParams.search,
     filter: searchParams.filter,
+    page: searchParams.page ? +searchParams.page : 1,
   });
   return (
     <>
@@ -62,6 +64,7 @@ export default async function Home({ searchParams }: SearchParamsProps) {
             ))
           ) : (
             <NoResult
+              key="NoResult"
               title="There are no questions to show"
               description="Be the first to break the silence! Ask a question and kickstart the
         discussion. Our query could be next big thing others learn from. Get
@@ -70,6 +73,13 @@ export default async function Home({ searchParams }: SearchParamsProps) {
               linkTitle="Ask a Question"
             />
           )}
+        </div>
+
+        <div className="mt-10">
+          <Pagination
+            pageNumber={searchParams?.page ? +searchParams.page : 1}
+            isNext={result.isNext}
+          />
         </div>
       </section>
     </>

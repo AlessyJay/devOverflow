@@ -6,6 +6,7 @@ import NoResult from "@/components/shared/NoResult";
 import Link from "next/link";
 import { getJoinedDate, getTimeStamp } from "@/lib/utils";
 import { SearchParamsProps } from "@/Types";
+import Pagination from "@/components/shared/Pagination";
 
 const page = async ({ searchParams }: SearchParamsProps) => {
   const result = await getAllTags({
@@ -66,6 +67,13 @@ const page = async ({ searchParams }: SearchParamsProps) => {
           />
         )}
       </section>
+
+      <div className="mt-10">
+        <Pagination
+          isNext={result.isNext}
+          pageNumber={searchParams.page ? +searchParams.page : 1}
+        />
+      </div>
     </div>
   );
 };
