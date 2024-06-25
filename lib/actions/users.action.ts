@@ -56,7 +56,7 @@ export const getAllUsers = async (params: GetAllTagsParams) => {
       .limit(pageSize);
     const isNext = totalUsers > skip + allUser.length;
 
-    return { allUser, isNext };
+    return { allUser, isNext, totalUsers, pageSize };
   } catch (error) {
     console.log(error);
     throw error;
@@ -230,7 +230,7 @@ export const allSavedQuestions = async (params: GetSavedQuestionsParams) => {
     const totalUsers = await User.countDocuments(query);
     const isNext = totalUsers > skip + savedQuestions.length;
 
-    return { questions: savedQuestions, isNext };
+    return { questions: savedQuestions, isNext, pageSize, totalUsers };
   } catch (error) {
     console.log(error);
     throw error;
@@ -241,9 +241,12 @@ export const userProfile = async (params: GetUserByIdParams) => {
   try {
     connectToDB();
 
-    const { userId } = params;
+    const { userId, page = 1, pageSize = 1 } = params;
+    const skip = (page - 1) * pageSize;
 
-    const user = await User.findOne({ clerkId: userId });
+    const user = await User.findOne({ clerkId: userId })
+      .skip(skip)
+      .limit(pageSize);
 
     if (!user) {
       throw new Error("User not found!");
@@ -256,7 +259,16 @@ export const userProfile = async (params: GetUserByIdParams) => {
       author: user._id,
     });
 
-    return { user, totalQuestions, totalAnswers };
+    const isQuestionsNext = totalQuestions > skip + user.length;
+    const isAnswersNext = totalAnswers > skip + user.length;
+
+    return {
+      user,
+      totalQuestions,
+      totalAnswers,
+      isAnswersNext,
+      isQuestionsNext,
+    };
   } catch (error) {
     console.log(error);
     throw error;
@@ -270,6 +282,8 @@ export const getUserQuestions = async (params: GetUserStatsParams) => {
     // eslint-disable-next-line no-unused-vars
     const { userId, page = 1, pageSize = 10 } = params;
 
+    const skip = (page - 1) * pageSize;
+
     const totalQuestions = await Question.countDocuments({ author: userId });
 
     const userQuestions = await Question.find({ author: userId })
@@ -277,6 +291,8 @@ export const getUserQuestions = async (params: GetUserStatsParams) => {
         views: -1,
         upvotes: -1,
       })
+      .skip(skip)
+      .limit(pageSize)
       .populate({ path: "tags", model: Tag, select: "_id name" })
       .populate({
         path: "author",
@@ -284,7 +300,9 @@ export const getUserQuestions = async (params: GetUserStatsParams) => {
         select: "_id clerkId name picture",
       });
 
-    return { totalQuestions, questions: userQuestions };
+    const isNext = totalQuestions > skip + userQuestions.length;
+
+    return { totalQuestions, questions: userQuestions, isNext, pageSize };
   } catch (error) {
     console.log(error);
     throw error;

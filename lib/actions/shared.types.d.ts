@@ -67,6 +67,8 @@ export interface CreateQuestionParams {
 
 export interface GetQuestionByIdParams {
   questionId: string;
+  page?: number;
+  pageSize?: number;
 }
 
 export interface QuestionVoteParams {
@@ -118,6 +120,8 @@ export interface CreateUserParams {
 
 export interface GetUserByIdParams {
   userId: string;
+  page?: number;
+  pageSize?: number;
 }
 
 export interface GetAllUsersParams {

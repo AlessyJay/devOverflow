@@ -5,6 +5,7 @@ import React from "react";
 import NoResult from "../NoResult";
 import Filter from "../search/Filter";
 import { AnswerFilters } from "@/Constant/filters";
+import Pagination from "../Pagination";
 
 interface Props extends SearchParamsProps {
   userId: string;
@@ -14,7 +15,7 @@ interface Props extends SearchParamsProps {
 const AnswersTab = async ({ userId, clerkId, searchParams }: Props) => {
   const result = await getUserAnswer({
     userId,
-    page: 1,
+    page: searchParams.page ? +searchParams.page : 1,
     filter: searchParams.filter,
   });
   return (
@@ -45,6 +46,13 @@ const AnswersTab = async ({ userId, clerkId, searchParams }: Props) => {
           link=""
           linkTitle=""
           type="answer"
+        />
+      )}
+
+      {result.countAnswers > result.pageSize && (
+        <Pagination
+          isNext={result.isNext}
+          pageNumber={searchParams.page ? +searchParams.page : 1}
         />
       )}
     </>

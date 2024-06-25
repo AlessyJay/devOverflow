@@ -78,7 +78,7 @@ export const getAllTags = async (params: GetAllTagsParams) => {
     const totalTags = await Tag.countDocuments(query);
     const isNext = totalTags > skip + tags.length;
 
-    return { tags, isNext };
+    return { tags, isNext, totalTags, pageSize };
   } catch (error) {
     console.log(error);
     throw error;
@@ -90,9 +90,11 @@ export const getSpecificTag = async (params: GetQuestionsByTagIdParams) => {
     connectToDB();
 
     // eslint-disable-next-line no-unused-vars
-    const { tagId, page = 1, pageSize = 10, searchQuery } = params;
+    const { tagId, page = 1, pageSize = 15, searchQuery } = params;
 
     const tagFilter: FilterQuery<ITag> = { _id: tagId };
+
+    const skip = (page - 1) * pageSize;
 
     const tag = await Tag.findOne(tagFilter).populate({
       path: "questions",
@@ -102,6 +104,8 @@ export const getSpecificTag = async (params: GetQuestionsByTagIdParams) => {
         : {},
       options: {
         sort: { createdAt: -1 },
+        skip,
+        limit: pageSize,
       },
       populate: [
         { path: "tags", model: Tag, select: "_id name" },
@@ -114,10 +118,13 @@ export const getSpecificTag = async (params: GetQuestionsByTagIdParams) => {
     }
 
     const questions = tag.questions;
+    const totalTags = await Question.countDocuments({
+      tags: tagId,
+      ...tag.questions.math,
+    });
+    const isNext = totalTags > skip + questions.length;
 
-    console.log({ questions });
-
-    return { tagTitle: tag.name, questions };
+    return { tagTitle: tag.name, questions, isNext, totalTags, pageSize };
   } catch (error) {
     console.log(error);
     throw error;

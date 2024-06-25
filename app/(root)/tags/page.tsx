@@ -68,12 +68,14 @@ const page = async ({ searchParams }: SearchParamsProps) => {
         )}
       </section>
 
-      <div className="mt-10">
-        <Pagination
-          isNext={result.isNext}
-          pageNumber={searchParams.page ? +searchParams.page : 1}
-        />
-      </div>
+      {result.totalTags > result.pageSize && (
+        <div className="mt-10">
+          <Pagination
+            isNext={result.isNext}
+            pageNumber={searchParams.page ? +searchParams.page : 1}
+          />
+        </div>
+      )}
     </div>
   );
 };
