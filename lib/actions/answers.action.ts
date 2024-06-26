@@ -45,13 +45,35 @@ export const GetAnswers = async (params: GetAnswersParams) => {
   try {
     connectToDB();
 
-    const { questionId } = params;
+    const { questionId, page = 1, pageSize = 1, sortBy } = params;
+    const skip = (page - 1) * pageSize;
+
+    let sortOptions = {};
+    switch (sortBy) {
+      case "highestUpvotes":
+        sortOptions = { upvoted: -1 };
+        break;
+      case "lowestUpvotes":
+        sortOptions = { upvoted: 1 };
+        break;
+      case "recent":
+        sortOptions = { createdAt: -1 };
+        break;
+      case "old":
+        sortOptions = { createdAt: 1 };
+        break;
+    }
 
     const GetAnswer = await Answer.find({ question: questionId })
       .populate("author", "_id clerkId name picture")
-      .sort({ createdAt: -1 });
+      .skip(skip)
+      .limit(pageSize)
+      .sort(sortOptions);
 
-    return { GetAnswer };
+    const totalAnswers = await Answer.countDocuments({ question: questionId });
+    const isNext = totalAnswers > skip + GetAnswer.length;
+
+    return { GetAnswer, isNext, totalAnswers, pageSize };
   } catch (error) {
     console.log(error);
     throw error;
@@ -157,6 +179,8 @@ export const getUserAnswer = async (params: GetUserStatsParams) => {
 
     const countAnswers = await Answer.countDocuments({ author: userId });
 
+    const skip = (page - 1) * pageSize;
+
     let sortAnswers = {};
 
     switch (filter) {
@@ -178,6 +202,8 @@ export const getUserAnswer = async (params: GetUserStatsParams) => {
 
     const answers = await Answer.find({ author: userId })
       .sort(sortAnswers)
+      .skip(skip)
+      .limit(pageSize)
       .populate({ path: "question", model: Question, select: "_id title" })
       .populate({
         path: "author",
@@ -185,7 +211,9 @@ export const getUserAnswer = async (params: GetUserStatsParams) => {
         select: "_id clerkId name picture",
       });
 
-    return { countAnswers, answers };
+    const isNext = countAnswers > skip + answers.length;
+
+    return { countAnswers, answers, isNext, pageSize };
   } catch (error) {
     console.log(error);
     throw error;

@@ -32,7 +32,7 @@ const page = async ({
     createdAt,
     upvotes,
     downvotes,
-  } = result;
+  } = result.question;
 
   const { userId: clerkId } = auth();
 

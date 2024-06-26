@@ -1,7 +1,7 @@
 import QuestionCards from "@/components/Cards/QuestionCards";
 import NoResult from "@/components/shared/NoResult";
+import Pagination from "@/components/shared/Pagination";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
-// import { IQuestion } from "@/database/question.model";
 import { getSpecificTag } from "@/lib/actions/tags.action";
 import { URLProps } from "@/Types";
 import React from "react";
@@ -9,8 +9,8 @@ import React from "react";
 const page = async ({ params, searchParams }: URLProps) => {
   const result = await getSpecificTag({
     tagId: params.id,
-    page: 1,
-    searchQuery: searchParams.q,
+    page: searchParams.page ? +searchParams.page : 1,
+    searchQuery: searchParams.search,
   });
   return (
     <>
@@ -64,6 +64,15 @@ const page = async ({ params, searchParams }: URLProps) => {
             />
           )}
         </div>
+
+        {result.totalTags > result.pageSize && (
+          <div className="mt-10">
+            <Pagination
+              isNext={result.isNext}
+              pageNumber={searchParams.page ? +searchParams.page : 1}
+            />
+          </div>
+        )}
       </section>
     </>
   );

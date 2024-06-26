@@ -64,10 +64,10 @@ export const getQuestions = async (params: GetQuestionsParams) => {
     const totalQuestion = await Question.countDocuments(query);
     const isNext: any = totalQuestion > skip + questions.length;
 
-    return { questions, isNext };
+    return { questions, isNext, totalQuestion, pageSize };
   } catch (err) {
     console.log(err);
-    return { questions: [], isNext: false };
+    return err;
   }
 };
 
@@ -75,7 +75,7 @@ export const getQuestionById = async (params: GetQuestionByIdParams) => {
   try {
     connectToDB();
 
-    const { questionId } = params;
+    const { questionId, page = 1, pageSize = 1 } = params;
 
     const question = await Question.findById(questionId)
       .populate({
@@ -89,7 +89,16 @@ export const getQuestionById = async (params: GetQuestionByIdParams) => {
         select: "_id clerkId name picture",
       });
 
-    return question;
+    const skip = (page - 1) * pageSize;
+    // const paginatedAnswers = question.answers.slice(skip, skip + pageSize);
+    const totalAnswers = question.answers.length;
+    const isNext = totalAnswers > skip + pageSize;
+
+    return {
+      question,
+      isNext,
+      totalAnswers,
+    };
   } catch (error) {
     console.log(error);
     throw error;

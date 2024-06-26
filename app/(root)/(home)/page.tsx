@@ -11,7 +11,7 @@ import { getQuestions } from "@/lib/actions/questions.action";
 import Link from "next/link";
 
 export default async function Home({ searchParams }: SearchParamsProps) {
-  const result = await getQuestions({
+  const result: any = await getQuestions({
     searchQuery: searchParams.search,
     filter: searchParams.filter,
     page: searchParams.page ? +searchParams.page : 1,
@@ -48,20 +48,36 @@ export default async function Home({ searchParams }: SearchParamsProps) {
 
       <section className="my-10 flex w-full flex-col gap-6">
         <div>
-          {result && result.questions.length > 0 ? (
-            result?.questions.map((item) => (
-              <QuestionCards
-                key={item.id}
-                id={item.id}
-                title={item.title}
-                tags={item.tags}
-                author={item.author}
-                upvote={item.upvotes}
-                views={item.views}
-                createdAt={item.createdAt}
-                answers={item.answers}
-              />
-            ))
+          {result.questions.length > 0 ? (
+            result.questions.map(
+              (item: {
+                id: string;
+                title: string;
+                tags: { _id: string; name: string }[];
+                author: {
+                  [x: string]: string;
+                  id: string;
+                  name: string;
+                  picture: string;
+                };
+                upvotes: string[];
+                views: number;
+                createdAt: Date;
+                answers: object[];
+              }) => (
+                <QuestionCards
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  tags={item.tags}
+                  author={item.author}
+                  upvote={item.upvotes}
+                  views={item.views}
+                  createdAt={item.createdAt}
+                  answers={item.answers}
+                />
+              ),
+            )
           ) : (
             <NoResult
               key="NoResult"
@@ -75,12 +91,14 @@ export default async function Home({ searchParams }: SearchParamsProps) {
           )}
         </div>
 
-        <div className="mt-10">
-          <Pagination
-            pageNumber={searchParams?.page ? +searchParams.page : 1}
-            isNext={result.isNext}
-          />
-        </div>
+        {result.totalQuestions > result.pageSize && (
+          <div className="mt-10">
+            <Pagination
+              pageNumber={searchParams?.page ? +searchParams.page : 1}
+              isNext={result.isNext}
+            />
+          </div>
+        )}
       </section>
     </>
   );
