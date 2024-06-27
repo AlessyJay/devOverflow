@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { formUrlQuery, removeKeysFromQuery } from "@/lib/utils";
 import { CircleX } from "lucide-react";
+import GlobalResult from "./GlobalResult";
 
 const GlobalSearch = () => {
   const searchParams = useSearchParams();
@@ -43,6 +44,14 @@ const GlobalSearch = () => {
 
   const clearInput = () => {
     setInputValue("");
+    setIsOpen(false);
+
+    const newUrl = removeKeysFromQuery({
+      params: searchParams.toString(),
+      keysToremove: ["global", "type"],
+    });
+
+    router.push(newUrl, { scroll: false });
   };
   return (
     <div className="relative w-full max-w-[600px] max-lg:hidden">
@@ -75,6 +84,8 @@ const GlobalSearch = () => {
             onClick={clearInput}
           />
         )}
+
+        {isOpen && <GlobalResult />}
       </div>
     </div>
   );
