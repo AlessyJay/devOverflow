@@ -239,28 +239,32 @@ export const allSavedQuestions = async (params: GetSavedQuestionsParams) => {
 
 export const userProfile = async (params: GetUserByIdParams) => {
   try {
-    connectToDB();
+    // Ensure database connection
+    await connectToDB();
 
     const { userId, page = 1, pageSize = 1 } = params;
     const skip = (page - 1) * pageSize;
 
+    // Log userId to ensure it's passed correctly
+    console.log(`Searching for user with ID: ${userId}`);
+
+    // Find the user by clerkId
     const user = await User.findOne({ clerkId: userId })
       .skip(skip)
       .limit(pageSize);
 
+    // If user is not found, throw an error
     if (!user) {
+      console.error(`User not found with ID: ${userId}`);
       throw new Error("User not found!");
     }
 
-    const totalQuestions = await Question.countDocuments({
-      author: user._id,
-    });
-    const totalAnswers = await Answer.countDocuments({
-      author: user._id,
-    });
+    // Count user's questions and answers
+    const totalQuestions = await Question.countDocuments({ author: user._id });
+    const totalAnswers = await Answer.countDocuments({ author: user._id });
 
-    const isQuestionsNext = totalQuestions > skip + user.length;
-    const isAnswersNext = totalAnswers > skip + user.length;
+    const isQuestionsNext = totalQuestions > skip + pageSize;
+    const isAnswersNext = totalAnswers > skip + pageSize;
 
     return {
       user,
@@ -270,7 +274,7 @@ export const userProfile = async (params: GetUserByIdParams) => {
       isQuestionsNext,
     };
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching user profile:", error);
     throw error;
   }
 };

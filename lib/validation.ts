@@ -13,8 +13,8 @@ export const AnswerSchema = z.object({
 });
 
 export const EditProfileSchema = z.object({
-  name: z.string().min(2),
-  username: z.string(),
+  name: z.string().min(2).max(30),
+  username: z.string().min(2).max(15),
   portfolioWebsite: z.string().optional(),
   location: z.string().optional(),
   bio: z.string().optional(),

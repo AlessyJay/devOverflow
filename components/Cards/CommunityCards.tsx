@@ -22,7 +22,7 @@ const CommunityCards = async ({ user }: Props) => {
 
   return (
     <Link
-      href={`/profile/${_id}`}
+      href={`/profile/${clerkId}`}
       className="shadow-light100_darknone w-full max-sm:min-w-full xs:w-[260px]"
     >
       <span className="background-light900_dark200 light-border flex w-full flex-col items-center justify-center rounded-2xl border p-8">
@@ -31,7 +31,7 @@ const CommunityCards = async ({ user }: Props) => {
           alt={username}
           width={100}
           height={100}
-          className="rounded-full"
+          className="size-[140px] rounded-full object-contain"
         />
 
         <span className="mt-4 text-center">
