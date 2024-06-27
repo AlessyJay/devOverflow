@@ -44,11 +44,7 @@ const CommunityCards = async ({ user }: Props) => {
             <span className="flex items-center gap-2">
               {interactedTags?.map((tag) => (
                 <>
-                  <span
-                    className="flex justify-between gap-2"
-                    key={tag.id}
-                    id={tag.id}
-                  >
+                  <span key={tag.id} id={tag.id}>
                     <Badge className="subtle-medium background-light800_dark300 text-light400_light500 rounded-md border-none px-4 py-2 uppercase">
                       {tag.title}
                     </Badge>

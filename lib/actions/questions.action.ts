@@ -137,9 +137,20 @@ export const CreateQuestion = async (params: CreateQuestionParams) => {
     });
 
     // Create an interaction record for the user's ask_question
+    await Interaction.create({
+      user: author,
+      action: "ask_question",
+      question: question.id,
+      tags: tagsDocument,
+    });
+
+    // Increment author's reputation by +5 for creating a question
+    await User.findByIdAndUpdate(author, { $inc: { reputation: 5 } });
+
     revalidatePath(path);
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
@@ -177,11 +188,24 @@ export const upvoteQuestion = async (params: QuestionVoteParams) => {
       new: true,
     });
 
+    // Check if the user is the author of the question
+    if (question.author.toString() === userId) {
+      return null;
+    }
+
     if (!question) {
       throw new Error("Question not found");
     }
 
-    // Increment author's reputation by =10 for upvotting
+    // Increment author's reputation by +1/-1 for upvotting
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasupVoted ? -1 : 1 },
+    });
+
+    // Increment author's reputation by +10/-10 for recieving an upvote/downvote to the question.
+    await User.findByIdAndUpdate(question.author, {
+      $inc: { reputation: hasupVoted ? -10 : 10 },
+    });
 
     revalidatePath(path);
   } catch (error) {
@@ -223,6 +247,11 @@ export const downvoteQuestion = async (params: QuestionVoteParams) => {
     const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
       new: true,
     });
+
+    // Check if the user is the author of the question
+    if (question.author.toString() === userId) {
+      return null;
+    }
 
     if (!question) {
       throw new Error("Question not found");
