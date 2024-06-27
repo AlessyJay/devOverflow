@@ -37,7 +37,7 @@ const page = async ({ searchParams }: SearchParamsProps) => {
         {result.allUser.length > 0 ? (
           result.allUser.map((user) => (
             <>
-              <CommunityCards key={user.id} user={user} />
+              <CommunityCards key={user.clerkId} user={user} />
             </>
           ))
         ) : (

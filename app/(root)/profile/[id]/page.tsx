@@ -31,7 +31,7 @@ const Page = async ({ params, searchParams }: URLProps) => {
             width={140}
             height={140}
             alt="profile photo"
-            className="rounded-full object-cover"
+            className="size-[140px] rounded-full object-cover"
           />
 
           {/* Edit Profile */}
@@ -48,7 +48,7 @@ const Page = async ({ params, searchParams }: URLProps) => {
           </div>
 
           <div className="mt-3">
-            <h2 className="h2-bold text-dark100_light900">
+            <h2 className="h2-bold text-dark100_light900 line-clamp-1">
               {userInfo.user.name}
             </h2>
             <p className="paragraph-regular text-dark200_light800">
