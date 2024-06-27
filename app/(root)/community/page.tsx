@@ -11,6 +11,7 @@ import React from "react";
 const page = async ({ searchParams }: SearchParamsProps) => {
   const result = await getAllUsers({
     searchQuery: searchParams.search,
+    filter: searchParams.filter,
     page: searchParams.page ? +searchParams.page : 1,
   });
   return (
