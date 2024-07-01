@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { QuestionsSchema } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
-import { Editor } from "@tinymce/tinymce-react";
 import {
   Form,
   FormControl,
@@ -21,7 +20,7 @@ import { Badge } from "../ui/badge";
 import Image from "next/image";
 import { CreateQuestion, editQuestion } from "@/lib/actions/questions.action";
 import { usePathname, useRouter } from "next/navigation";
-// import QuillEditor from "../shared/QuillEditor";
+import { Editor } from "@tinymce/tinymce-react";
 
 interface props {
   mongoUserId: string;
