@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { QuestionsSchema } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
-import { Editor } from "@tinymce/tinymce-react";
 import {
   Form,
   FormControl,
@@ -21,7 +20,7 @@ import { Badge } from "../ui/badge";
 import Image from "next/image";
 import { CreateQuestion, editQuestion } from "@/lib/actions/questions.action";
 import { usePathname, useRouter } from "next/navigation";
-// import QuillEditor from "../shared/QuillEditor";
+import { Editor } from "@tinymce/tinymce-react";
 
 interface props {
   mongoUserId: string;
@@ -157,7 +156,6 @@ const Question = ({ mongoUserId, type, questionDetails }: props) => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 {/* Todo: add an editor component */}
-                {/* <QuillEditor /> */}
                 <Editor
                   apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY}
                   onInit={(_evt, editor) =>

@@ -32,8 +32,6 @@ export const CreateAnswer = async (params: CreateAnswerParams) => {
       $push: { answers: newAnswers._id },
     });
 
-    // TODO: Add interaction
-
     revalidatePath(path);
   } catch (error) {
     console.log(error);
@@ -45,7 +43,7 @@ export const GetAnswers = async (params: GetAnswersParams) => {
   try {
     connectToDB();
 
-    const { questionId, page = 1, pageSize = 1, sortBy } = params;
+    const { questionId, page = 1, pageSize = 10, sortBy } = params;
     const skip = (page - 1) * pageSize;
 
     let sortOptions = {};
@@ -114,9 +112,24 @@ export const upvoteAnswer = async (params: AnswerVoteParams) => {
       new: true,
     });
 
+    // Check if the user is the author of the question
+    if (answer.author.toString() === userId) {
+      return null;
+    }
+
     if (!answer) {
       throw new Error("Answer not found");
     }
+
+    // Increment author's reputation by +1/-1 for upvotting
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasupVoted ? -1 : 1 },
+    });
+
+    // Increment author's reputation by +10/-10 for recieving an upvote/downvote to the question.
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasupVoted ? -10 : 10 },
+    });
 
     revalidatePath(path);
   } catch (error) {
@@ -159,9 +172,24 @@ export const downvoteAnswer = async (params: AnswerVoteParams) => {
       new: true,
     });
 
+    // Check if the user is the author of the question
+    if (answer.author.toString() === userId) {
+      return null;
+    }
+
     if (!answer) {
       throw new Error("Answer not found");
     }
+
+    // Increment author's reputation by +1/-1 for upvotting
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasupVoted ? -1 : 1 },
+    });
+
+    // Increment author's reputation by +10/-10 for recieving an upvote/downvote to the question.
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasupVoted ? -10 : 10 },
+    });
 
     revalidatePath(path);
   } catch (error) {

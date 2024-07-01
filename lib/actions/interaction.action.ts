@@ -12,7 +12,7 @@ export const viewQuestions = async (params: ViewQuestionParams) => {
     const { questionId, userId } = params;
 
     // Update view count for the question
-    await Question.findByIdAndUpdate(questionId, { $inc: { views: 1 } });
+    // await Question.findByIdAndUpdate(questionId, { $inc: { views: 1 } });
 
     if (userId) {
       const existingInteraction = await Interaction.findOne({
@@ -21,8 +21,7 @@ export const viewQuestions = async (params: ViewQuestionParams) => {
         question: questionId,
       });
 
-      if (existingInteraction)
-        return console.log("User has already viewed the question.");
+      if (existingInteraction) return null;
 
       //   Create interaction
       await Interaction.create({
@@ -30,6 +29,9 @@ export const viewQuestions = async (params: ViewQuestionParams) => {
         action: "view",
         question: questionId,
       });
+
+      // Update view count for the question
+      await Question.findByIdAndUpdate(questionId, { $inc: { views: 1 } });
     }
   } catch (error) {
     console.log(error);

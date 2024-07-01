@@ -8,7 +8,7 @@ import { getQuestionById } from "@/lib/actions/questions.action";
 import { getUserById } from "@/lib/actions/users.action";
 import { formatNumber, getTimeStamp } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -38,10 +38,6 @@ const page = async ({
 
   let mongoUser;
 
-  if (!clerkId) {
-    redirect("/sign-in");
-  }
-
   if (clerkId) {
     mongoUser = await getUserById({ userId: clerkId });
   }
@@ -70,11 +66,11 @@ const page = async ({
             <Votes
               type="Question"
               itemId={JSON.stringify(_id)}
-              userId={JSON.stringify(mongoUser.id)}
+              userId={JSON.stringify(mongoUser?.id)}
               upvotes={upvotes.length}
-              hasUpvoted={upvotes.includes(mongoUser.id)}
+              hasUpvoted={upvotes.includes(mongoUser?.id)}
               downvotes={downvotes.length}
-              hasDownVoted={downvotes.includes(mongoUser.id)}
+              hasDownVoted={downvotes.includes(mongoUser?.id)}
               hasSaved={mongoUser?.saved.includes(_id)}
             />
           </div>
@@ -127,15 +123,19 @@ const page = async ({
 
       <AllAnswers
         questionId={_id}
-        userId={mongoUser.id}
+        userId={mongoUser?.id}
         totalAnswers={answers.length}
       />
 
-      <Answer
-        question={content}
-        questionId={JSON.stringify(_id)}
-        authorId={JSON.stringify(mongoUser.id)}
-      />
+      {!JSON.stringify(mongoUser?.id) ? (
+        <p>Please, login before comment!</p>
+      ) : (
+        <Answer
+          question={content}
+          questionId={JSON.stringify(_id)}
+          authorId={JSON.stringify(mongoUser?.id)}
+        />
+      )}
     </>
   );
 };
