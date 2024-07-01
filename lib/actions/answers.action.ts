@@ -43,7 +43,7 @@ export const GetAnswers = async (params: GetAnswersParams) => {
   try {
     connectToDB();
 
-    const { questionId, page = 1, pageSize = 1, sortBy } = params;
+    const { questionId, page = 1, pageSize = 10, sortBy } = params;
     const skip = (page - 1) * pageSize;
 
     let sortOptions = {};
