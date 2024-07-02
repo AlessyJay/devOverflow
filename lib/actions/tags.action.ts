@@ -75,6 +75,7 @@ export const getAllTags = async (params: GetAllTagsParams) => {
       .sort(sortOptions)
       .skip(skip)
       .limit(pageSize);
+
     const totalTags = await Tag.countDocuments(query);
     const isNext = totalTags > skip + tags.length;
 

@@ -8,14 +8,14 @@ import { getTimeStamp } from "@/lib/utils";
 import ParseHTML from "./ParseHTML";
 import Votes from "./Votes";
 import Pagination from "./Pagination";
-import { URLProps } from "@/Types";
 
-interface Props extends URLProps {
+interface Props {
   questionId: string;
   userId: string;
   totalAnswers: number;
   page?: number;
   filter?: number;
+  searchParams?: { [key: string]: string | undefined };
 }
 
 const AllAnswers = async ({
