@@ -8,8 +8,9 @@ import { getTimeStamp } from "@/lib/utils";
 import ParseHTML from "./ParseHTML";
 import Votes from "./Votes";
 import Pagination from "./Pagination";
+import { URLProps } from "@/Types";
 
-interface Props {
+interface Props extends URLProps {
   questionId: string;
   userId: string;
   totalAnswers: number;
@@ -22,11 +23,12 @@ const AllAnswers = async ({
   userId,
   totalAnswers,
   page,
-  filter,
+  searchParams,
 }: Props) => {
   const result = await GetAnswers({
     questionId,
-    page: page ? +page : 1,
+    page: searchParams?.page ? +searchParams.page : 1,
+    sortBy: searchParams?.filter,
   });
 
   return (
