@@ -128,7 +128,13 @@ const page = async ({
       />
 
       {!JSON.stringify(mongoUser?.id) ? (
-        <p>Please, login before comment!</p>
+        <p className="my-10 text-center text-2xl">
+          Please,{" "}
+          <Link href="/sign-in" className="text-orange-500">
+            login
+          </Link>{" "}
+          before comment! ✌
+        </p>
       ) : (
         <Answer
           question={content}

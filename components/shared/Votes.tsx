@@ -12,6 +12,7 @@ import { downvoteAnswer, upvoteAnswer } from "@/lib/actions/answers.action";
 import { saveQuestion } from "@/lib/actions/users.action";
 import { useRouter } from "next/router";
 import { viewQuestions } from "@/lib/actions/interaction.action";
+import { useToast } from "../ui/use-toast";
 
 interface Props {
   type: string;
@@ -36,8 +37,9 @@ const Votes = ({
 }: Props) => {
   const pathname = usePathname();
   const router = useRouter;
+  const { toast, dismiss } = useToast();
 
-  const handleSaved = () => {
+  const handleSaved = async () => {
     if (!userId) {
       return;
     }
@@ -47,11 +49,22 @@ const Votes = ({
       questionId: JSON.parse(itemId),
       path: pathname,
     });
+
+    const savedToast: any = toast({
+      title: `Question ${!hasSaved ? "saved in" : "removed from"} your collection.`,
+      variant: !hasSaved ? "default" : "destructive",
+    });
+
+    setTimeout(() => dismiss(savedToast), 1500);
   };
 
   const handleVoted = async (action: string) => {
-    console.log(`User ID: ${userId}`);
-    console.log(`itemId: ${itemId}`);
+    if (!userId) {
+      return toast({
+        title: "Oops!",
+        description: "You have to login before performing this action. ✌",
+      });
+    }
 
     if (!userId) {
       return;
@@ -80,6 +93,12 @@ const Votes = ({
       }
 
       // todo: show a toast
+      const upvoteToast: any = toast({
+        title: `Upvote ${!hasUpvoted ? "Successful" : "Removed"}`,
+        variant: !hasUpvoted ? "default" : "destructive",
+      });
+
+      setTimeout(() => dismiss(upvoteToast), 1500);
     }
 
     if (action === "downvote") {
@@ -102,7 +121,12 @@ const Votes = ({
         });
       }
 
-      //   todo: show a toast
+      const downvoteToast: any = toast({
+        title: `Downvote ${!hasDownVoted ? "Added" : "Removed"}`,
+        variant: !hasDownVoted ? "default" : "destructive",
+      });
+
+      setTimeout(() => dismiss(downvoteToast), 1500);
     }
   };
 

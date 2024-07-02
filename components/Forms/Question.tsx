@@ -21,6 +21,7 @@ import Image from "next/image";
 import { CreateQuestion, editQuestion } from "@/lib/actions/questions.action";
 import { usePathname, useRouter } from "next/navigation";
 import { Editor } from "@tinymce/tinymce-react";
+import TagsSuggestion from "../shared/search/TagsSuggestion";
 
 interface props {
   mongoUserId: string;
@@ -31,6 +32,8 @@ interface props {
 const Question = ({ mongoUserId, type, questionDetails }: props) => {
   const editorRef = useRef(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -109,6 +112,11 @@ const Question = ({ mongoUserId, type, questionDetails }: props) => {
         form.trigger();
       }
     }
+  };
+
+  const handleChange = (e: any) => {
+    setIsOpen(true);
+    if (!e) return setIsOpen(false);
   };
 
   const handleTagRemove = (tag: string, field: any) => {
@@ -211,11 +219,13 @@ const Question = ({ mongoUserId, type, questionDetails }: props) => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 <>
+                  {isOpen && <TagsSuggestion />}
                   <Input
                     disabled={type === "Edit"}
                     placeholder="Add tags..."
                     className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                     onKeyDown={(e) => handleInputKeyDown(e, field)}
+                    onChange={(e) => handleChange(e.target.value)}
                   />
                   {field.value.length > 0 && (
                     <div className="flex-start mt-2.5 gap-2.5">
