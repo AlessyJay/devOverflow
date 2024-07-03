@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -19,9 +19,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "../ui/badge";
 import Image from "next/image";
 import { CreateQuestion, editQuestion } from "@/lib/actions/questions.action";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Editor } from "@tinymce/tinymce-react";
 import TagsSuggestion from "../shared/search/TagsSuggestion";
+import { formUrlQuery } from "@/lib/utils";
 
 interface props {
   mongoUserId: string;
@@ -36,6 +37,36 @@ const Question = ({ mongoUserId, type, questionDetails }: props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const router = useRouter();
   const pathname = usePathname();
+
+  // Query the tags suggestion
+  const searchParams = useSearchParams();
+  const query = searchParams.get("suggestTags");
+  const [search, setSearch] = useState(query || "");
+
+  useEffect(() => {
+    const debouncing = setTimeout(() => {
+      if (search) {
+        const newUrl = formUrlQuery({
+          params: searchParams.toString(),
+          key: "suggestTags",
+          value: search,
+        });
+        router.push(newUrl, { scroll: false });
+      } else {
+        if (pathname === "/ask-question") {
+          const newUrl = formUrlQuery({
+            params: searchParams.toString(),
+            key: "suggestTags",
+            value: null,
+          });
+
+          router.push(newUrl, { scroll: false });
+        }
+      }
+    }, 500);
+
+    return () => clearTimeout(debouncing);
+  }, [search, router, searchParams, query, pathname]);
 
   const parseQuestionDetails =
     questionDetails && JSON.parse(questionDetails || "");
@@ -111,11 +142,15 @@ const Question = ({ mongoUserId, type, questionDetails }: props) => {
       } else {
         form.trigger();
       }
+
+      setSearch("");
+      setIsOpen(false);
     }
   };
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: string) => {
     setIsOpen(true);
+    setSearch(e);
     if (!e) return setIsOpen(false);
   };
 
@@ -222,6 +257,7 @@ const Question = ({ mongoUserId, type, questionDetails }: props) => {
                   {isOpen && <TagsSuggestion />}
                   <Input
                     disabled={type === "Edit"}
+                    value={search}
                     placeholder="Add tags..."
                     className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                     onKeyDown={(e) => handleInputKeyDown(e, field)}
