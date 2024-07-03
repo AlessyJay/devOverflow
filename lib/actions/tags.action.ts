@@ -86,6 +86,28 @@ export const getAllTags = async (params: GetAllTagsParams) => {
   }
 };
 
+export const getSuggestTags = async (params: GetAllTagsParams) => {
+  try {
+    connectToDB();
+
+    // eslint-disable-next-line no-unused-vars
+    const { pageSize = 5, searchQuery } = params;
+
+    const query: any = {};
+
+    if (searchQuery) {
+      query.$or = [{ name: { $regex: new RegExp(searchQuery, "i") } }];
+    }
+
+    const getTags: string[] = await Tag.find(query).limit(pageSize);
+
+    return getTags;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export const getSpecificTag = async (params: GetQuestionsByTagIdParams) => {
   try {
     connectToDB();

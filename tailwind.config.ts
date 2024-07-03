@@ -16,6 +16,7 @@ module.exports = {
     },
     extend: {
       colors: {
+        codeBlockColour: "#2a4555",
         primary: {
           500: "#FF7000",
           100: "#FFF1E6",

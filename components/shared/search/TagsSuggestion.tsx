@@ -1,37 +1,78 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-// eslint-disable-next-line no-unused-vars
-import React, { useState, useEffect } from "react";
-// eslint-disable-next-line no-unused-vars
+import { Skeleton } from "@/components/ui/skeleton";
+import { getSuggestTags } from "@/lib/actions/tags.action";
 import { useSearchParams } from "next/navigation";
-// eslint-disable-next-line no-unused-vars
-import { formUrlQuery } from "@/lib/utils";
+import React, { useEffect, useState } from "react";
 
-const TagsSuggestion = () => {
-  //   const searchParams = useSearchParams();
-  //   const search = searchParams.get("suggestTag") || "";
-  //   const [inputValue, setInputValue] = useState<string>("");
+interface TagsSuggestionProps {
+  onTagClick: (tag: any) => void;
+}
 
-  //   useEffect(() => {
-  //     const debouncing = setTimeout(async() => {
-  //         if(inputValue){
-  //             const newUrl = formUrlQuery({
-  //                 params: searchParams.toString(),
-  //                 key: 'suggestTag',
-  //                 value: null,
-  //             })
-  //         }
-  //     })
-  //   }, [inputValue, setInputValue, search, searchParams]);
+const TagsSuggestion = ({ onTagClick }: TagsSuggestionProps) => {
+  const searchParams = useSearchParams();
+  const [value, setValue] = useState([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const suggestTags = searchParams.get("suggestTags");
+
+  useEffect(() => {
+    const fetchResult = async () => {
+      setValue([]);
+      setIsLoading(true);
+
+      try {
+        const res: any = await getSuggestTags({
+          searchQuery: suggestTags || undefined,
+        });
+
+        setValue(res);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (suggestTags) {
+      fetchResult();
+    }
+  }, [suggestTags]);
 
   return (
-    <div className="text-dark300_light900 z-10 rounded-xl bg-light-800 px-3 py-2 shadow-sm dark:bg-dark-400">
+    <div className="text-dark200_light800 z-10 flex items-center rounded-xl bg-light-800 px-5 py-2 shadow-sm dark:bg-dark-400 max-sm:flex-wrap">
       Tags:{" "}
-      <Button
-        type="button"
-        className={`light-border-2 small-medium rounded-2xl px-5 py-2 capitalize dark:text-light-800 dark:hover:text-primary-500`}
-      >
-        Tag
-      </Button>
+      {isLoading && (
+        <>
+          {[1, 2, 3, 4, 5].map((item) => (
+            <Skeleton
+              key={item}
+              className="light-border-2 small-medium ml-2 flex rounded-2xl px-5 py-2"
+            />
+          ))}
+        </>
+      )}
+      {value.length > 0 ? (
+        value.map((tag: any) => {
+          return (
+            <Button
+              type="button"
+              key={tag._id}
+              className={`light-border-2 small-medium ml-5 rounded-2xl bg-orange-400 px-5 py-2 capitalize text-white`}
+              onClick={() => onTagClick(tag)}
+            >
+              {tag.name}
+            </Button>
+          );
+        })
+      ) : isLoading ? (
+        ""
+      ) : (
+        <p className="text-dark300_light900 ml-5">
+          There is no such a tag. You can create that new one! ✌
+        </p>
+      )}
     </div>
   );
 };
