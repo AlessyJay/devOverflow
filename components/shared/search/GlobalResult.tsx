@@ -27,6 +27,8 @@ const GlobalResult = () => {
         // Fetch everything from database all at once.
         const res = await globalSearch({ query: global, type });
 
+        console.log(res);
+
         setResult(JSON.parse(res));
       } catch (error) {
         console.log(error);

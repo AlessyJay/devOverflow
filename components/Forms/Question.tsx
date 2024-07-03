@@ -1,5 +1,6 @@
 "use client";
 
+// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,9 +21,10 @@ import { Badge } from "../ui/badge";
 import Image from "next/image";
 import { CreateQuestion, editQuestion } from "@/lib/actions/questions.action";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Editor } from "@tinymce/tinymce-react";
+// import { Editor } from "@tinymce/tinymce-react";
 import TagsSuggestion from "../shared/search/TagsSuggestion";
 import { formUrlQuery } from "@/lib/utils";
+import Tiptap from "../shared/tiptap/Tiptap";
 
 interface props {
   mongoUserId: string;
@@ -31,7 +33,7 @@ interface props {
 }
 
 const Question = ({ mongoUserId, type, questionDetails }: props) => {
-  const editorRef = useRef(null);
+  // const editorRef = useRef(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -159,6 +161,12 @@ const Question = ({ mongoUserId, type, questionDetails }: props) => {
 
     form.setValue("tags", newTags);
   };
+
+  const handleClickToAddTag = (tag: any) => {
+    form.setValue("tags", [...form.getValues("tags"), tag.name]);
+    setSearch("");
+    setIsOpen(false);
+  };
   return (
     <Form {...form}>
       <form
@@ -199,7 +207,11 @@ const Question = ({ mongoUserId, type, questionDetails }: props) => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 {/* Todo: add an editor component */}
-                <Editor
+                <Tiptap
+                  onChange={(text: any) => field.onChange(text)}
+                  content={parseQuestionDetails?.content || ""}
+                />
+                {/* <Editor
                   apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY}
                   onInit={(_evt, editor) =>
                     // @ts-ignore
@@ -234,7 +246,7 @@ const Question = ({ mongoUserId, type, questionDetails }: props) => {
                       "alignright alignjustify | bullist numlist |",
                     content_style: "body { font-family:Inter; font-size:16px }",
                   }}
-                />
+                /> */}
               </FormControl>
               <FormDescription className="body-regular mt-2.5 text-light-500">
                 Introduce the problem, and expand on what you put in the title.
@@ -254,7 +266,9 @@ const Question = ({ mongoUserId, type, questionDetails }: props) => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 <>
-                  {isOpen && <TagsSuggestion />}
+                  {isOpen && (
+                    <TagsSuggestion onTagClick={handleClickToAddTag} />
+                  )}
                   <Input
                     disabled={type === "Edit"}
                     value={search}
