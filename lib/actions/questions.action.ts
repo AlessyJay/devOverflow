@@ -346,12 +346,15 @@ export const getRecommendedQuestions = async (params: RecommendedParams) => {
       .exec();
 
     // Extract tags from user's interactions
-    const userTags = userInteractions.reduce((tags, interactions) => {
-      if (interactions.tags) {
-        tags = tags.concat(interactions.tags);
-      }
-      return tags;
-    }, []);
+    const userTags = userInteractions.reduce(
+      (tags: string | any[], interactions: { tags: any }) => {
+        if (interactions.tags) {
+          tags = tags.concat(interactions.tags);
+        }
+        return tags;
+      },
+      [],
+    );
 
     // Get distinct tag IDs from users interaction
     const disctinctUserTagIds = [
