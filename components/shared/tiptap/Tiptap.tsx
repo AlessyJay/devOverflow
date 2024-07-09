@@ -10,13 +10,18 @@ import Blockquote from "@tiptap/extension-blockquote";
 import BulletList from "@tiptap/extension-bullet-list";
 import Heading from "@tiptap/extension-heading";
 import Toolbar from "./Toolbar";
+import { useEffect } from "react";
 
-const Tiptap = ({ onChange, content }: any) => {
+interface Props {
+  onChange: (content: string) => void;
+  content?: string;
+}
+
+const Tiptap = ({ onChange, content = "" }: Props) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
       CodeBlock.configure({
-        languageClassPrefix: "language-javascript",
         HTMLAttributes: {
           class:
             "p-3 bg-blue-800 border light-border-2 rounded-sm bg-codeBlockColour",
@@ -43,12 +48,18 @@ const Tiptap = ({ onChange, content }: any) => {
     },
   });
 
+  useEffect(() => {
+    if (editor) {
+      editor.commands.setContent(content);
+    }
+  }, [content, editor]);
+
   return (
     <div>
       <Toolbar editor={editor} content={content} />
       <EditorContent
         editor={editor}
-        className="max-h-[300px] overflow-y-auto whitespace-normal break-words max-sm:w-full"
+        className="max-h-[300px] overflow-y-auto whitespace-pre-line break-words max-sm:w-full"
       />
     </div>
   );

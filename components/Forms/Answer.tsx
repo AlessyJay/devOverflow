@@ -13,11 +13,13 @@ import {
 } from "../ui/form";
 import { AnswerSchema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Editor } from "@tinymce/tinymce-react";
+// import { Editor } from "@tinymce/tinymce-react";
 import { CreateAnswer } from "@/lib/actions/answers.action";
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
 import Image from "next/image";
+import Tiptap from "../shared/tiptap/Tiptap";
+import { useToast } from "../ui/use-toast";
 
 interface Props {
   question: string;
@@ -32,6 +34,9 @@ const Answer = ({ question, questionId, authorId }: Props) => {
   // eslint-disable-next-line no-unused-vars
   const [isSubmittingAI, setIsSubmittingAI] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [editorContent, setEditorContent] = useState<string>("");
+
+  const { toast, dismiss } = useToast();
 
   const form = useForm<z.infer<typeof AnswerSchema>>({
     resolver: zodResolver(AnswerSchema),
@@ -52,12 +57,16 @@ const Answer = ({ question, questionId, authorId }: Props) => {
       });
 
       form.reset();
+      setEditorContent("");
 
-      if (editorRef.current) {
-        const editor = editorRef.current as any;
+      const showToast: any = toast({
+        title: "Your answer has been created!",
+        variant: "default",
+      });
 
-        editor.setContent("");
-      }
+      return setTimeout(() => {
+        dismiss(showToast);
+      }, 1500);
     } catch (error) {
       console.log(error);
       throw error;
@@ -107,6 +116,13 @@ const Answer = ({ question, questionId, authorId }: Props) => {
       }
 
       // Toast notifications
+      const showToast: any = toast({
+        title: "AI Answer Created!",
+      });
+
+      return setTimeout(() => {
+        dismiss(showToast);
+      }, 1500);
     } catch (error) {
       console.log(error);
     } finally {
@@ -115,7 +131,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
   };
   return (
     <div>
-      <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
+      <div className="mt-5 flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
         <h4 className="paragraph-semibold text-dark400_light800">
           Write your answer here
         </h4>
@@ -152,42 +168,9 @@ const Answer = ({ question, questionId, authorId }: Props) => {
               <FormItem className="flex w-full flex-col gap-3">
                 <FormControl className="mt-3.5">
                   {/* Todo: add an editor component */}
-                  <Editor
-                    apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY}
-                    onInit={(_evt, editor) =>
-                      // @ts-ignore
-                      (editorRef.current = editor)
-                    }
-                    onBlur={field.onBlur}
-                    onEditorChange={(content) => field.onChange(content)}
-                    initialValue=""
-                    init={{
-                      height: 350,
-                      menubar: false,
-                      plugins: [
-                        "advlist",
-                        "autolink",
-                        "lists",
-                        "link",
-                        "image",
-                        "charmap",
-                        "preview",
-                        "anchor",
-                        "searchreplace",
-                        "visualblocks",
-                        "codesample",
-                        "fullscreen",
-                        "insertdatetime",
-                        "media",
-                        "table",
-                      ],
-                      toolbar:
-                        "undo redo | blocks | " +
-                        "codesample | bold italic underline forecolor | alignleft aligncenter " +
-                        "alignright alignjustify | bullist numlist |",
-                      content_style:
-                        "body { font-family:Inter; font-size:16px }",
-                    }}
+                  <Tiptap
+                    onChange={(content: any) => field.onChange(content)}
+                    content={editorContent}
                   />
                 </FormControl>
                 <FormDescription className="body-regular mt-2.5 text-light-500">

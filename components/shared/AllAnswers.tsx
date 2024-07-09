@@ -8,9 +8,12 @@ import { getTimeStamp } from "@/lib/utils";
 import ParseHTML from "./ParseHTML";
 import Votes from "./Votes";
 import Pagination from "./Pagination";
+import { SignedIn } from "@clerk/nextjs";
+import EditDeleteAction from "./search/EditDeleteAction";
 
 interface Props {
   questionId: string;
+  clerkId?: string;
   userId: string;
   totalAnswers: number;
   page?: number;
@@ -21,6 +24,7 @@ interface Props {
 const AllAnswers = async ({
   questionId,
   userId,
+  clerkId,
   totalAnswers,
   page,
   searchParams,
@@ -30,6 +34,10 @@ const AllAnswers = async ({
     page: searchParams?.page ? +searchParams.page : 1,
     sortBy: searchParams?.filter,
   });
+
+  const store: string[] = result.GetAnswer.map((item) => item.author.clerkId);
+
+  const showActionButtons = clerkId && store.includes(clerkId);
 
   return (
     <div className="mt-11">
@@ -77,7 +85,7 @@ const AllAnswers = async ({
                   </div>
                 </Link>
 
-                <div className="flex justify-end">
+                <div className="flex justify-start">
                   {/* todo: voting function for comments */}
                   <Votes
                     type="Answer"
@@ -89,6 +97,15 @@ const AllAnswers = async ({
                     hasDownVoted={answer.downvoted.includes(userId)}
                   />
                 </div>
+
+                <SignedIn>
+                  {showActionButtons && (
+                    <EditDeleteAction
+                      type="Answer"
+                      itemId={JSON.stringify(answer._id)}
+                    />
+                  )}
+                </SignedIn>
               </div>
             </div>
             <ParseHTML data={answer.content} />

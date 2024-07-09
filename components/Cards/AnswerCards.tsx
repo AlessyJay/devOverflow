@@ -4,6 +4,7 @@ import Metric from "../shared/Metric";
 import { formatNumber, getTimeStamp } from "@/lib/utils";
 import { SignedIn } from "@clerk/nextjs";
 import EditDeleteAction from "../shared/search/EditDeleteAction";
+import ParseHTML from "../shared/ParseHTML";
 
 interface Props {
   clerkId?: string | null;
@@ -34,6 +35,8 @@ const AnswerCard = ({
 }: Props) => {
   const showActionButtons = clerkId && clerkId === author.clerkId;
 
+  console.log(_id);
+
   return (
     <Link
       href={`/question/${question._id}`}
@@ -44,9 +47,10 @@ const AnswerCard = ({
           <span className="subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden">
             {getTimeStamp(createdAt)}
           </span>
-          <h3 className="sm:h3-semibold base-semibold text-dark200_light900 line-clamp-1 flex-1">
-            {content}
-          </h3>
+          <ParseHTML
+            data={content}
+            className="sm:h3-semibold base-semibold text-dark200_light900 line-clamp-1 flex-1"
+          />
         </div>
 
         <SignedIn>
@@ -69,7 +73,7 @@ const AnswerCard = ({
 
         <div className="flex-center gap-3">
           <Metric
-            imgUrl="/assets/icons/like.svg"
+            imgUrl="/assets/icons/upvote.svg"
             alt="like icon"
             value={formatNumber(upvotes)}
             title=" Votes"
