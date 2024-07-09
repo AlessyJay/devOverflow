@@ -20,7 +20,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "DevOverflow",
+  title: { default: "Dev Overflow", template: "%s | DevTalks" },
   description: `A community-driven platform for asking and answering
      programming questions. Get help, Share knowledge, 
      and collaborate with developers from around the world. 
@@ -28,6 +28,37 @@ export const metadata: Metadata = {
      algorithms, data structures, and much more.`,
   icons: {
     icon: "/assets/images/site-logo.svg",
+  },
+  openGraph: {
+    title: "Dev Overflow",
+    description: `A community-driven platform for asking and answering
+     programming questions. Get help, Share knowledge, 
+     and collaborate with developers from around the world. 
+     Explore topics in web development, mobile app development, 
+     algorithms, data structures, and much more.`,
+    url: "https://devoverflow.it",
+    siteName: "Dev Overflow",
+    locale: "en_GB",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  twitter: {
+    title: "Dev Overflow",
+    card: "summary_large_image",
+  },
+  verification: {
+    google: "eZSdmzAXlLkKhNJzfgwDqWORghxnJ8qR9_CHdAh5-xw",
+    yandex: "14d2e73487fa6c71",
   },
 };
 

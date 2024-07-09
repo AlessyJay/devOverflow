@@ -7,15 +7,37 @@ import Pagination from "@/components/shared/Pagination";
 import Filter from "@/components/shared/search/Filter";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
 import { Button } from "@/components/ui/button";
-import { getQuestions } from "@/lib/actions/questions.action";
+import {
+  getQuestions,
+  getRecommendedQuestions,
+} from "@/lib/actions/questions.action";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 
 export default async function Home({ searchParams }: SearchParamsProps) {
-  const result: any = await getQuestions({
-    searchQuery: searchParams.search,
-    filter: searchParams.filter,
-    page: searchParams.page ? +searchParams.page : 1,
-  });
+  const { userId } = auth();
+  let result: any;
+
+  if (searchParams?.filter === "recommended") {
+    if (userId) {
+      result = await getRecommendedQuestions({
+        userId,
+        searchQuery: searchParams.search,
+        page: searchParams.page ? +searchParams.page : 1,
+      });
+    } else {
+      result = {
+        questions: [],
+        isNext: false,
+      };
+    }
+  } else {
+    result = await getQuestions({
+      searchQuery: searchParams.search,
+      filter: searchParams.filter,
+      page: searchParams.page ? +searchParams.page : 1,
+    });
+  }
 
   return (
     <>

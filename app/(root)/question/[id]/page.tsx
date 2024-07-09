@@ -107,7 +107,7 @@ const page = async ({
 
       <ParseHTML
         data={content}
-        className="text-dark300_light900 rounded-md border p-5 shadow-sm"
+        className="markdown text-dark300_light900 w-full min-w-full rounded-md border p-5 shadow-sm"
       />
 
       <div className="mt-8 flex flex-wrap gap-2">
