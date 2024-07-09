@@ -25,6 +25,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import TagsSuggestion from "../shared/search/TagsSuggestion";
 import { formUrlQuery } from "@/lib/utils";
 import Tiptap from "../shared/tiptap/Tiptap";
+import { useToast } from "../ui/use-toast";
 
 interface props {
   mongoUserId: string;
@@ -39,6 +40,7 @@ const Question = ({ mongoUserId, type, questionDetails }: props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { toast, dismiss } = useToast();
 
   // Query the tags suggestion
   const searchParams = useSearchParams();
@@ -111,6 +113,14 @@ const Question = ({ mongoUserId, type, questionDetails }: props) => {
 
         // navigate to home page
         router.push("/");
+
+        const showToast: any = toast({
+          title: "Question Created Successfully",
+        });
+
+        setTimeout(() => {
+          dismiss(showToast);
+        }, 1500);
       }
     } catch (err) {
     } finally {
@@ -211,42 +221,6 @@ const Question = ({ mongoUserId, type, questionDetails }: props) => {
                   onChange={(text: any) => field.onChange(text)}
                   content={parseQuestionDetails?.content || ""}
                 />
-                {/* <Editor
-                  apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY}
-                  onInit={(_evt, editor) =>
-                    // @ts-ignore
-                    (editorRef.current = editor)
-                  }
-                  onBlur={field.onBlur}
-                  onEditorChange={(content) => field.onChange(content)}
-                  initialValue={parseQuestionDetails?.content || ""}
-                  init={{
-                    height: 350,
-                    menubar: false,
-                    plugins: [
-                      "advlist",
-                      "autolink",
-                      "lists",
-                      "link",
-                      "image",
-                      "charmap",
-                      "preview",
-                      "anchor",
-                      "searchreplace",
-                      "visualblocks",
-                      "codesample",
-                      "fullscreen",
-                      "insertdatetime",
-                      "media",
-                      "table",
-                    ],
-                    toolbar:
-                      "undo redo | blocks | " +
-                      "codesample | bold italic underline forecolor | alignleft aligncenter " +
-                      "alignright alignjustify | bullist numlist |",
-                    content_style: "body { font-family:Inter; font-size:16px }",
-                  }}
-                /> */}
               </FormControl>
               <FormDescription className="body-regular mt-2.5 text-light-500">
                 Introduce the problem, and expand on what you put in the title.

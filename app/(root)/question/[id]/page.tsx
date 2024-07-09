@@ -47,7 +47,7 @@ const page = async ({
       <div className="flex-start w-full flex-col">
         <div className="flex w-full flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
           <Link
-            href={`/profile/${author.id}`}
+            href={`/profile/${author.clerkId}`}
             className="flex items-center justify-start gap-1"
           >
             <Image
@@ -124,6 +124,7 @@ const page = async ({
       <AllAnswers
         questionId={_id}
         userId={mongoUser?.id}
+        clerkId={clerkId || undefined}
         totalAnswers={answers.length}
       />
 
