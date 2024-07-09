@@ -17,5 +17,10 @@ export const EditProfileSchema = z.object({
   username: z.string().min(2).max(15),
   portfolioWebsite: z.string().optional(),
   location: z.string().optional(),
-  bio: z.string().optional(),
+  bio: z
+    .string()
+    .max(100, {
+      message: "Oops! You've hit the 200-character limit. Please revise.",
+    })
+    .optional(),
 });

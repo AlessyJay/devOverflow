@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -27,6 +27,7 @@ interface Props {
 const Profile = ({ clerkId, user }: Props) => {
   const parsedUser = JSON.parse(user);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [limitText, setLimitText] = useState<number>(100);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -65,6 +66,24 @@ const Profile = ({ clerkId, user }: Props) => {
       console.log(error);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    const bioValue = formSchema.watch("bio");
+    if (bioValue) {
+      setLimitText(100 - bioValue.length);
+    } else {
+      setLimitText(100);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formSchema.watch("bio")]);
+
+  const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (e.target.value.length > 100) {
+      e.preventDefault();
+    } else {
+      formSchema.setValue("bio", e.target.value);
     }
   };
 
@@ -158,13 +177,19 @@ const Profile = ({ clerkId, user }: Props) => {
                   <Textarea
                     placeholder="What's special about you?"
                     {...field}
-                    className="no-focus paragraph-regular light-border-2 background-light700_dark300 text-dark300_light700 min-h-[56px] border"
+                    className="no-focus paragraph-regular light-border-2 background-light700_dark300 text-dark300_light700 h-[150px] resize-none border"
+                    onChange={handleBioChange}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+          <span className="text-dark300_light900">
+            {limitText < 1
+              ? `${limitText} character remaining`
+              : `${limitText} characters remaining`}
+          </span>
 
           <div className="mt-7 flex justify-end">
             <Button
