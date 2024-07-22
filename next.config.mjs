@@ -4,9 +4,24 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "img.clerk.com",
+        hostname: "*",
         pathname: "/**",
       },
+      // {
+      //   protocol: "https",
+      //   hostname: "image.status.io",
+      //   pathname: "/**",
+      // },
+      // {
+      //   protocol: "https",
+      //   hostname: "www.leidos.com",
+      //   pathname: "/**",
+      // },
+      // {
+      //   protocol: "https",
+      //   hostname: "encrypted-tbn0.gstatic.com",
+      //   pathname: "/**",
+      // },
     ],
   },
 };
