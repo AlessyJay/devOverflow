@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -14,28 +14,45 @@ import { formUrlQuery } from "@/lib/utils";
 import { MapPinned } from "lucide-react";
 
 interface Props {
-  filters: {
-    name: string;
-    value: string;
-  }[];
   otherClasses?: string;
   containerClasses?: string;
 }
 
-const JobFilter = ({ filters, otherClasses, containerClasses }: Props) => {
+const JobFilter = ({ otherClasses, containerClasses }: Props) => {
   const search = useSearchParams();
   const router = useRouter();
-  const paramFilter = search.get("filter");
+  const paramFilter = search.get("location");
+  const [filter, setFilter] = useState<any[]>([]);
 
   const handleFilter = (value: string) => {
     const newUrl = formUrlQuery({
-      params: "",
-      key: "filter",
+      params: search.toString(),
+      key: "location",
       value,
     });
 
     router.push(newUrl, { scroll: false });
   };
+
+  useEffect(() => {
+    try {
+      const getLocations = async () => {
+        const res = await fetch("/api/locations");
+
+        if (!res.ok) throw new Error("Something went wrong!");
+
+        const data = await res.json();
+        data.sort(
+          (a: { name: { common: string } }, b: { name: { common: any } }) =>
+            a.name.common.localeCompare(b.name.common),
+        );
+        setFilter(data);
+      };
+      getLocations();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
   return (
     <div className={`relative ${containerClasses}`}>
       <Select
@@ -52,13 +69,13 @@ const JobFilter = ({ filters, otherClasses, containerClasses }: Props) => {
         </SelectTrigger>
         <SelectContent className="background-light800_dark300 text-dark500_light700">
           <SelectGroup>
-            {filters.map((item) => (
+            {filter.map((location) => (
               <SelectItem
-                key={item.value}
-                value={item.value}
+                key={location.name.common}
+                value={location.name.common}
                 className="cursor-pointer"
               >
-                {item.name}
+                {location.name.common}
               </SelectItem>
             ))}
           </SelectGroup>

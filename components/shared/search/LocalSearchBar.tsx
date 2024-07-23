@@ -1,7 +1,11 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { formUrlQuery, removeKeysFromQuery } from "@/lib/utils";
+import {
+  formUrlQuery,
+  removeKeysFromQuery,
+  replaceSpacesWithPercent20,
+} from "@/lib/utils";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -25,31 +29,30 @@ const LocalSearchBar = ({
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const search = searchParams.get("search") || "";
+  const search = searchParams.get("q") || "";
   // eslint-disable-next-line no-unused-vars
   const [inputValue, setInputValue] = useState<string>(search || "");
 
   useEffect(() => {
     const delayDebouncing = setTimeout(async () => {
+      const encodedQuery = replaceSpacesWithPercent20(inputValue);
+
+      const newUrl = formUrlQuery({
+        params: searchParams.toString(),
+        key: "q",
+        value: encodedQuery,
+      });
+
       if (inputValue) {
-        const newUrl = formUrlQuery({
-          params: searchParams.toString(),
-          key: "search",
-          value: inputValue,
-        });
-
         router.push(newUrl, { scroll: false });
-      } else {
-        if (pathname === route) {
-          const newUrl = removeKeysFromQuery({
-            params: searchParams.toString(),
-            keysToremove: ["search"],
-          });
-
-          router.push(newUrl, { scroll: false });
-        }
+      } else if (search) {
+        const withoutQuery = removeKeysFromQuery({
+          params: searchParams.toString(),
+          keysToremove: ["q"],
+        });
+        router.push(withoutQuery, { scroll: false });
       }
-    }, 500);
+    }, 800);
 
     return () => clearTimeout(delayDebouncing);
   }, [search, route, pathname, searchParams, inputValue, router]);

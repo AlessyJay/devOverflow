@@ -1,10 +1,11 @@
 "use client";
 
-import { getTimeStamp } from "@/lib/utils";
-import { API_HOST, API_KEY } from "@/Types/SecretKey";
+import { getTimeStamp, replaceSpacesWithPercent20 } from "@/lib/utils";
+// import { API_HOST, API_KEY } from "@/Types/SecretKey";
 import { BriefcaseBusiness, Globe, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
 
 const JobCards = () => {
@@ -13,39 +14,37 @@ const JobCards = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(null);
+  const searchParams = useSearchParams();
+  const query = searchParams.get("q") || "Fullstack developer";
+  const location = searchParams.get("location");
 
   useEffect(() => {
     const getJobs = async () => {
       setIsLoading(true);
+
       try {
         const res = await fetch(
-          "https://jsearch.p.rapidapi.com/search?query=developers&page=1&num_pages=2&date_posted=all",
-          {
-            method: "GET",
-            headers: {
-              "x-rapidapi-key": API_KEY || "",
-              "x-rapidapi-host": API_HOST || "",
-            },
-          },
+          `/api/jobs?q=${replaceSpacesWithPercent20(query)}&location=${location}`,
         );
 
-        if (!res.ok) throw new Error("Network response was not OK.");
-
+        if (!res.ok) {
+          throw new Error("Network response was not OK.");
+        }
         const data = await res.json();
-        console.log(data);
         setJobs(data.data);
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
+        setError(error.message);
       } finally {
         setIsLoading(false);
       }
     };
 
     getJobs();
-  }, []);
+  }, [location, query]);
+
   return (
     <div>
-      {jobs.map((job) => (
+      {jobs?.map((job) => (
         <div
           key={job.job_id}
           className="card-wrapper mb-10 rounded-[10px] p-9 sm:px-11"

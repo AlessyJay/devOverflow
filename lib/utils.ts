@@ -169,3 +169,7 @@ export const assignBadges = (params: BadgeParams) => {
 
   return badgeCounts;
 };
+
+export const replaceSpacesWithPercent20 = (text: string): string => {
+  return text.replace(/\s/g, "%20");
+};
